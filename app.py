@@ -812,12 +812,57 @@ def _fetch_stooq_hist_jp(ticker: str) -> pd.DataFrame | None:
     return out
 
 
+def _fetch_yahoo_chart_api(ticker: str) -> pd.DataFrame | None:
+    """
+    Yahoo Finance Chart API を直接呼び出してOHLCVを取得。
+    yfinanceライブラリを経由しないため、英字コード（151A等）や
+    yfinanceで取れない銘柄でも取得できることがある。
+    """
+    code = str(ticker or "").replace(".T", "").strip()
+    if not code:
+        return None
+    symbol = f"{code}.T"
+    url = f"https://query2.finance.yahoo.com/v8/finance/chart/{symbol}"
+    params = {"range": "1y", "interval": "1d", "includePrePost": "false"}
+    headers = {"User-Agent": random.choice(USER_AGENTS)}
+
+    try:
+        resp = requests.get(url, params=params, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        result = data.get("chart", {}).get("result", [])
+        if not result:
+            return None
+
+        timestamps = result[0].get("timestamp", [])
+        quote = result[0].get("indicators", {}).get("quote", [{}])[0]
+        if not timestamps or not quote:
+            return None
+
+        df = pd.DataFrame({
+            "Open": quote.get("open", []),
+            "High": quote.get("high", []),
+            "Low": quote.get("low", []),
+            "Close": quote.get("close", []),
+            "Volume": quote.get("volume", []),
+        }, index=pd.to_datetime(timestamps, unit="s", utc=True))
+        df.index = df.index.tz_convert("Asia/Tokyo").tz_localize(None)
+        df.index.name = "Date"
+        df = df.dropna(subset=["Close"])
+        if len(df) < 5:
+            return None
+        df["Volume"] = df["Volume"].fillna(0)
+        return df
+    except Exception:
+        return None
+
+
 def _fetch_yf_data_with_retry(ticker: str, max_retries: int = 2, base_delay: float = 3.0):
     """
     OHLCV履歴のみを取得（高速化版）。
     ★ info は KABU+ から取得するため、ここでは取らない。
-    ★ yf.download() は yf.Ticker().history() より高速。
-    ★ リトライ回数を削減（3→2）、待機時間を短縮（5秒→3秒）。
+    ★ 3段階フォールバック: yf.download() → Yahoo Chart API直接 → Stooq
     """
     last_error = None
 
@@ -843,7 +888,12 @@ def _fetch_yf_data_with_retry(ticker: str, max_retries: int = 2, base_delay: flo
             if attempt < max_retries - 1:
                 time.sleep(base_delay * (2 ** attempt))
 
-    # 2) Stooq フォールバック（英字コード 151A 等に有効）
+    # 2) Yahoo Finance Chart API 直接呼び出し（yfinanceライブラリを迂回）
+    hist_yc = _fetch_yahoo_chart_api(ticker)
+    if hist_yc is not None and len(hist_yc) >= 5:
+        return hist_yc
+
+    # 3) Stooq フォールバック（英字コード 151A 等に有効）
     hist_sq = _fetch_stooq_hist_jp(ticker)
     if hist_sq is not None and len(hist_sq) >= 5:
         return hist_sq
