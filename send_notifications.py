@@ -1,251 +1,191 @@
 """
-ハゲタカSCOPE - 自動メール通知スクリプト（GitHub Actions用）
-
-目的：
-- data/ratios.json（fetch_data.py が生成）を読み込み
-- 登録ユーザーへ「候補一覧」を通知
-- 本通知は市場データの可視化に基づく候補の共有であり、銘柄推奨・売買助言ではない
+KABU+ データ取得クライアント（v1統合版）
+─────────────────────────────────────
+・全銘柄の株価・指標を1回のHTTPで一括取得
+・Basic認証 / Shift-JIS 自動処理
+・Streamlit環境（app.py）でもCLI環境（fetch_data.py）でも動作
 """
+
+from __future__ import annotations
+import io
 import os
-import json
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from pathlib import Path
-from datetime import datetime
-import pytz
+from typing import Optional, Tuple
+from datetime import datetime, timedelta
 
-import gspread
-from google.oauth2.service_account import Credentials
-from cryptography.fernet import Fernet
+import pandas as pd
+import requests
+from requests.auth import HTTPBasicAuth
 
-JST = pytz.timezone("Asia/Tokyo")
+# ==========================================
+# URL テンプレート
+# ==========================================
+PRICES_URL = (
+    "https://csvex.com/kabu.plus/csv/"
+    "japan-all-stock-prices-2/daily/"
+    "japan-all-stock-prices-2_{date}.csv"
+)
+INDICATORS_URL = (
+    "https://csvex.com/kabu.plus/csv/"
+    "japan-all-stock-data/daily/"
+    "japan-all-stock-data_{date}.csv"
+)
 
-# 通知対象条件（安全側のデフォルト）
-NOTIFY_LEVEL_MIN = 3      # LEVEL 3以上
-NOTIFY_FLOW_MIN = 70.0    # FlowScore 70以上
+# カラム名の正規化マッピング
+PRICE_COLUMNS = {
+    "SC": "code", "名称": "name", "市場": "market", "業種": "industry",
+    "日時": "timestamp", "株価": "price", "前日比": "change",
+    "前日比（％）": "change_pct", "前日終値": "prev_close",
+    "始値": "open", "高値": "high", "安値": "low", "VWAP": "vwap",
+    "出来高": "volume", "出来高率": "turnover_rate",
+    "売買代金（千円）": "trading_value_k", "時価総額（百万円）": "market_cap_m",
+    "値幅下限": "price_limit_low", "値幅上限": "price_limit_high",
+    "高値日付": "ytd_high_date", "年初来高値": "ytd_high",
+    "年初来高値乖離率": "ytd_high_deviation",
+    "安値日付": "ytd_low_date", "年初来安値": "ytd_low",
+    "年初来安値乖離率": "ytd_low_deviation",
+}
+INDICATOR_COLUMNS = {
+    "SC": "code", "名称": "name", "市場": "market", "業種": "industry",
+    "配当利回り（予想）": "dividend_yield", "1株配当": "dividend_per_share",
+    "PER（予想）": "per", "PBR（実績）": "pbr", "EPS": "eps", "BPS": "bps",
+    "最低購入金額": "min_purchase", "単元株数": "unit_shares",
+    "発行済株式数": "shares_outstanding",
+}
 
 
 # ==========================================
-# 暗号化キー取得・復号化
+# 認証情報の取得
 # ==========================================
-def get_encryption_key() -> str:
-    key = os.environ.get("ENCRYPTION_KEY")
-    if not key or key == "false":
-        raise ValueError("ENCRYPTION_KEY environment variable is not set correctly.")
-    return key
-
-
-def decrypt_password(encrypted_password: str) -> str:
-    if not encrypted_password:
-        return ""
+def get_credentials() -> Tuple[Optional[str], Optional[str]]:
+    """環境変数 → Streamlit Secrets の順で認証情報を取得"""
+    uid = os.environ.get("KABUPLUS_ID")
+    pwd = os.environ.get("KABUPLUS_PASSWORD")
+    if uid and pwd:
+        return uid, pwd
     try:
-        key = get_encryption_key()
-        fernet = Fernet(key.encode())
-        return fernet.decrypt(encrypted_password.encode()).decode()
-    except Exception as e:
-        print(f"復号化エラー: {e}")
-        return ""
-
-
-# ==========================================
-# Google Sheets接続
-# ==========================================
-def get_gspread_client():
-    credentials_json = os.environ.get("GSHEETS_CREDENTIALS")
-    if not credentials_json:
-        raise ValueError("GSHEETS_CREDENTIALS environment variable is not set")
-
-    credentials_dict = json.loads(credentials_json)
-    scopes = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive",
-    ]
-    credentials = Credentials.from_service_account_info(credentials_dict, scopes=scopes)
-    return gspread.authorize(credentials)
-
-
-def load_all_users() -> list:
-    try:
-        client = get_gspread_client()
-        spreadsheet_url = os.environ.get("SPREADSHEET_URL")
-        if not spreadsheet_url:
-            raise ValueError("SPREADSHEET_URL environment variable is not set")
-
-        spreadsheet = client.open_by_url(spreadsheet_url)
-        worksheet = spreadsheet.worksheet("settings")
-        records = worksheet.get_all_records()
-
-        users = []
-        for record in records:
-            email = (record.get("email", "") or "").strip()
-            encrypted_password = (record.get("encrypted_password", "") or "").strip()
-            if not email or not encrypted_password:
-                continue
-
-            password = decrypt_password(encrypted_password)
-            if not password:
-                continue
-
-            users.append({"email": email, "app_password": password})
-
-        return users
-
-    except Exception as e:
-        print(f"ユーザー読み込みエラー: {e}")
-        return []
-
-
-# ==========================================
-# データ読み込み
-# ==========================================
-def load_data() -> dict:
-    p = Path("data/ratios.json")
-    if not p.exists():
-        return {}
-    with open(p, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-
-def select_notify_items(data: dict) -> list[dict]:
-    stocks_data = data.get("data", {}) or {}
-    items = []
-    for ticker, d in stocks_data.items():
-        level = int(d.get("level", 0))
-        flow = float(d.get("flow_score", 0))
-        if level >= NOTIFY_LEVEL_MIN or flow >= NOTIFY_FLOW_MIN:
-            items.append({"ticker": ticker, **d})
-    items.sort(key=lambda x: (int(x.get("level", 0)), float(x.get("ma_score", 0)), float(x.get("flow_score", 0))), reverse=True)
-    return items
-
-
-# ==========================================
-# メール本文（★変更箇所）
-# ==========================================
-def create_email(data: dict, items: list[dict]) -> tuple[str, str] | tuple[None, None]:
-    if not items:
+        import streamlit as st
+        uid = st.secrets["kabuplus"]["id"]
+        pwd = st.secrets["kabuplus"]["password"]
+        return uid, pwd
+    except Exception:
         return None, None
 
-    updated_at = data.get("updated_at", "不明")
-    date_str = updated_at[:10] if isinstance(updated_at, str) else datetime.now(JST).strftime("%Y-%m-%d")
 
-    subject = f"🦅 ハゲタカSCOPE 候補通知: {len(items)}件 - {date_str}"
-
-    lines = [
-        "━" * 38,
-        " 🦅 ハゲタカSCOPE 検出レポート",
-        "━" * 38,
-        f"📅 更新日時: {updated_at}",
-        f"🎯 検出条件: LEVEL {NOTIFY_LEVEL_MIN}以上 または 需給スコア {NOTIFY_FLOW_MIN}以上",
-        "",
-        "本日の市場から、大口資金の介入や異常な出来高変化が疑われる銘柄をピックアップしました。",
-        "気になった銘柄があれば、アプリの【🦅 ハゲタカAIで診断する】にコードを入力して、",
-        "上値余地や安全性を必ずチェックしてください！",
-        "",
-        "▼ アプリはこちら（ログインして確認）",
-        "https://gentaai-hagetaka-scope.streamlit.app/",
-        "",
-        "━" * 38,
-        " 📊 本日のピックアップ銘柄",
-        "━" * 38,
-        ""
-    ]
-
-    # LEVELでグルーピング
-    levels_dict = {4: [], 3: [], 2: [], 1: [], 0: []}
-    for s in items[:30]:  # 上位30件まで
-        lv = int(s.get("level", 0))
-        levels_dict[lv].append(s)
-
-    for lv in [4, 3, 2, 1, 0]:
-        group = levels_dict[lv]
-        if not group:
+# ==========================================
+# CSV 取得（共通）
+# ==========================================
+def _fetch_csv(
+    url_template: str,
+    user_id: str,
+    password: str,
+    col_map: dict,
+    max_days_back: int = 7,
+) -> pd.DataFrame:
+    auth = HTTPBasicAuth(user_id, password)
+    for days_back in range(max_days_back):
+        target = datetime.now() - timedelta(days=days_back)
+        date_str = target.strftime("%Y%m%d")
+        url = url_template.format(date=date_str)
+        try:
+            resp = requests.get(url, auth=auth, timeout=60)
+            if resp.status_code != 200:
+                continue
+            text = resp.content.decode("shift-jis", errors="replace")
+            df = pd.read_csv(io.StringIO(text))
+            if len(df) < 100:
+                continue
+            rename = {k: v for k, v in col_map.items() if k in df.columns}
+            df = df.rename(columns=rename)
+            if "code" in df.columns:
+                df["code"] = df["code"].astype(str).str.strip()
+            df = _clean_numeric(df)
+            return df
+        except Exception:
             continue
-        
-        # LEVELごとの見出し
-        if lv == 4:
-            lines.append(f"🟥 【LEVEL 4】 （{len(group)}件） - 特異性高・要注目！")
-        elif lv == 3:
-            lines.append(f"🟧 【LEVEL 3】 （{len(group)}件）")
-        elif lv == 2:
-            lines.append(f"🟨 【LEVEL 2】 （{len(group)}件）")
-        elif lv == 1:
-            lines.append(f"🟦 【LEVEL 1】 （{len(group)}件）")
-        else:
-            lines.append(f"⬜ 【LEVEL 0】 （{len(group)}件）")
-            
-        lines.append("-" * 38)
-        
-        for s in group:
-            ticker = s.get("ticker", "").replace(".T", "")
-            name = (s.get("name", "") or "")[:15]
-            flow = s.get("flow_score", 0)
-            state = s.get("display_state", s.get("state", ""))
-            tags = s.get("tags", [])
-            tag_txt = " / ".join(tags[:4]) if tags else "-"
-            
-            lines.append(f"・{ticker} {name}")
-            lines.append(f"  [需給スコア: {flow}] 状態: {state}")
-            if tag_txt != "-":
-                lines.append(f"  {tag_txt}")
-            lines.append("")
-
-    lines.extend([
-        "━" * 38,
-        "⚠️ 免責事項",
-        "本通知は市場データの可視化に基づく情報提供であり、投資推奨や売買助言ではありません。",
-        "実際の投資判断は、利用者ご自身の責任において行ってください。",
-        "━" * 38,
-    ])
-
-    return subject, "\n".join(lines)
+    return pd.DataFrame()
 
 
-def send_email(to_email: str, app_password: str, subject: str, body: str) -> bool:
-    try:
-        msg = MIMEMultipart()
-        msg["From"] = to_email
-        msg["To"] = to_email
-        msg["Subject"] = subject
-        msg.attach(MIMEText(body, "plain", "utf-8"))
-
-        with smtplib.SMTP("smtp.gmail.com", 587) as server:
-            server.starttls()
-            server.login(to_email, app_password)
-            server.send_message(msg)
-        return True
-    except smtplib.SMTPAuthenticationError:
-        print(f"認証エラー: {to_email}")
-        return False
-    except Exception as e:
-        print(f"送信エラー: {to_email}: {e}")
-        return False
-
-
-def main():
-    data = load_data()
-    items = select_notify_items(data)
-
-    subject, body = create_email(data, items)
-    if not subject:
-        print("📭 通知対象がないため、メール送信は行いません。")
-        return
-
-    users = load_all_users()
-    if not users:
-        print("⚠️ ユーザーが取得できないため、送信をスキップします。")
-        return
-
-    ok = 0
-    ng = 0
-    for u in users:
-        if send_email(u["email"], u["app_password"], subject, body):
-            ok += 1
-        else:
-            ng += 1
-
-    print(f"✅ 送信完了: 成功={ok}, 失敗={ng}")
+def _clean_numeric(df: pd.DataFrame) -> pd.DataFrame:
+    cols = [
+        "price", "change", "change_pct", "prev_close", "open", "high", "low",
+        "vwap", "volume", "turnover_rate", "trading_value_k", "market_cap_m",
+        "ytd_high", "ytd_high_deviation", "ytd_low", "ytd_low_deviation",
+        "per", "pbr", "eps", "bps", "dividend_yield", "shares_outstanding",
+    ]
+    for col in cols:
+        if col in df.columns:
+            df[col] = (
+                df[col].astype(str)
+                .str.replace(",", "", regex=False)
+                .str.replace("－", "", regex=False)
+                .str.replace("-", "", regex=False)
+                .str.strip()
+            )
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df
 
 
-if __name__ == "__main__":
-    main()
+# ==========================================
+# 公開 API
+# ==========================================
+def fetch_stock_prices(user_id: str, password: str) -> pd.DataFrame:
+    return _fetch_csv(PRICES_URL, user_id, password, PRICE_COLUMNS)
+
+
+def fetch_stock_indicators(user_id: str, password: str) -> pd.DataFrame:
+    return _fetch_csv(INDICATORS_URL, user_id, password, INDICATOR_COLUMNS)
+
+
+def fetch_merged_data(user_id: str, password: str) -> pd.DataFrame:
+    prices = fetch_stock_prices(user_id, password)
+    if prices.empty:
+        return prices
+    indicators = fetch_stock_indicators(user_id, password)
+    if indicators.empty:
+        return prices
+    ind_cols = [c for c in indicators.columns
+                if c not in ("name", "market", "industry") or c == "code"]
+    return prices.merge(
+        indicators[ind_cols], on="code", how="left", suffixes=("", "_ind")
+    )
+
+
+def build_info_lookup(merged_df: pd.DataFrame) -> dict:
+    """
+    KABU+ データから {ticker: info_dict} の辞書を構築。
+    fetch_data.py で yf.Ticker().info の代替として使う。
+    キーは "1234.T" 形式。
+    """
+    lookup = {}
+    if merged_df.empty:
+        return lookup
+
+    for _, row in merged_df.iterrows():
+        code = str(row.get("code", ""))
+        if not code:
+            continue
+        ticker = f"{code}.T"
+        mcap_m = row.get("market_cap_m", 0) or 0
+        shares = row.get("shares_outstanding", 0) or 0
+        pbr_val = row.get("pbr", None)
+        price = row.get("price", 0) or 0
+        name = str(row.get("name", ""))
+
+        # sharesOutstanding が KABU+ にない場合、時価総額/株価から推定
+        if (not shares or shares <= 0) and mcap_m > 0 and price > 0:
+            shares = int(mcap_m * 1_000_000 / price)
+
+        lookup[ticker] = {
+            "marketCap": int(mcap_m * 1_000_000) if mcap_m else 0,
+            "sharesOutstanding": int(shares) if shares else None,
+            "priceToBook": float(pbr_val) if pbr_val and pbr_val > 0 else None,
+            "shortName": name,
+            "longName": name,
+            "currentPrice": float(price) if price else None,
+            "dividendRate": float(row.get("dividend_per_share", 0) or 0),
+            "dividendYield": float(row.get("dividend_yield", 0) or 0) / 100.0 if row.get("dividend_yield") else None,
+            "trailingAnnualDividendRate": None,
+            "trailingAnnualDividendYield": None,
+            "payoutRatio": None,
+        }
+    return lookup

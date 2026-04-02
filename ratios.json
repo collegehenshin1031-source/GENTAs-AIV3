@@ -1,0 +1,53 @@
+# 平日 JST 16:30 頃開始: JPX 全銘柄スキャン → ratios.json + data/history/shard_*.json 更新
+# デメリット: 実行に 1〜数時間かかることがある / Yahoo 側の制限で一部銘柄欠損の可能性あり
+name: Daily Fetch (Full Universe)
+
+on:
+  schedule:
+    - cron: '30 7 * * 1-5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+env:
+  FULL_UNIVERSE: "1"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Fetch volume data (JPX universe)
+        env:
+          KABUPLUS_ID: ${{ secrets.KABUPLUS_ID }}
+          KABUPLUS_PASSWORD: ${{ secrets.KABUPLUS_PASSWORD }}
+        run: python fetch_data.py
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/ratios.json data/history/
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "📊 Update market data $(date +'%Y-%m-%d %H:%M')"
+          git push
