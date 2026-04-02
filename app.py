@@ -858,11 +858,59 @@ def _fetch_yahoo_chart_api(ticker: str) -> pd.DataFrame | None:
         return None
 
 
+def _fetch_kabuoji3(ticker: str) -> pd.DataFrame | None:
+    """
+    kabuoji3.com から日本株のOHLCVを取得。
+    日本株専用サイトのため、yfinance/Stooqで取れない銘柄でも取得可能。
+    ※ pd.read_html は lxml 依存のため、正規表現で手動パースする。
+    """
+    code = str(ticker or "").replace(".T", "").strip()
+    if not code:
+        return None
+    url = f"https://kabuoji3.com/stock/{code}/"
+    headers = {"User-Agent": random.choice(USER_AGENTS)}
+    try:
+        resp = requests.get(url, headers=headers, timeout=15)
+        if resp.status_code != 200:
+            return None
+
+        # テーブル行を正規表現で抽出: <tr><td>日付</td><td>始値</td>...
+        rows = re.findall(r"<tr[^>]*>(.*?)</tr>", resp.text, re.DOTALL)
+        records = []
+        for row_html in rows:
+            cells = re.findall(r"<td[^>]*>(.*?)</td>", row_html, re.DOTALL)
+            if len(cells) >= 6:
+                # 日付, 始値, 高値, 安値, 終値, 出来高
+                date_str = cells[0].strip()
+                if not re.match(r"\d{4}-\d{2}-\d{2}", date_str):
+                    continue
+                try:
+                    o = float(cells[1].replace(",", ""))
+                    h = float(cells[2].replace(",", ""))
+                    l = float(cells[3].replace(",", ""))
+                    c = float(cells[4].replace(",", ""))
+                    v = float(cells[5].replace(",", ""))
+                    records.append({"Date": date_str, "Open": o, "High": h, "Low": l, "Close": c, "Volume": v})
+                except ValueError:
+                    continue
+
+        if len(records) < 5:
+            return None
+
+        df = pd.DataFrame(records)
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+        df = df.dropna(subset=["Date"]).set_index("Date").sort_index()
+        df["Volume"] = df["Volume"].fillna(0)
+        return df if len(df) >= 5 else None
+    except Exception:
+        return None
+
+
 def _fetch_yf_data_with_retry(ticker: str, max_retries: int = 2, base_delay: float = 3.0):
     """
     OHLCV履歴のみを取得（高速化版）。
     ★ info は KABU+ から取得するため、ここでは取らない。
-    ★ 3段階フォールバック: yf.download() → Yahoo Chart API直接 → Stooq
+    ★ 4段階フォールバック: yf.download() → Yahoo Chart API直接 → Stooq → kabuoji3
     """
     last_error = None
 
@@ -897,6 +945,11 @@ def _fetch_yf_data_with_retry(ticker: str, max_retries: int = 2, base_delay: flo
     hist_sq = _fetch_stooq_hist_jp(ticker)
     if hist_sq is not None and len(hist_sq) >= 5:
         return hist_sq
+
+    # 4) kabuoji3 フォールバック（日本株専用・最終手段）
+    hist_kj = _fetch_kabuoji3(ticker)
+    if hist_kj is not None and len(hist_kj) >= 5:
+        return hist_kj
 
     raise last_error if last_error else ValueError("データ取得に失敗しました")
 
