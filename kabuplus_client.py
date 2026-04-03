@@ -189,3 +189,61 @@ def build_info_lookup(merged_df: pd.DataFrame) -> dict:
             "payoutRatio": None,
         }
     return lookup
+
+
+# ==========================================
+# 信用取引残高データ（週次）
+# ==========================================
+MARGIN_URL = (
+    "https://csvex.com/kabu.plus/csv/"
+    "japan-all-stock-margin-transactions/weekly/"
+    "japan-all-stock-margin-transactions_{date}.csv"
+)
+
+MARGIN_COLUMNS = {
+    "SC": "code",
+    "名称": "name",
+    "市場": "market",
+    "信用買残": "margin_buy",
+    "信用買残前週比": "margin_buy_change",
+    "信用売残": "margin_sell",
+    "信用売残前週比": "margin_sell_change",
+    "貸借倍率": "margin_ratio",
+}
+
+
+def fetch_margin_data(user_id: str, password: str) -> pd.DataFrame:
+    """信用取引残高（週次）を一括取得"""
+    return _fetch_csv(MARGIN_URL, user_id, password, MARGIN_COLUMNS, max_days_back=14)
+
+
+def build_margin_lookup(margin_df: pd.DataFrame) -> dict:
+    """
+    信用残高データから {ticker: margin_dict} の辞書を構築。
+    キーは "1234.T" 形式。
+    """
+    lookup = {}
+    if margin_df.empty:
+        return lookup
+
+    for _, row in margin_df.iterrows():
+        code = str(row.get("code", ""))
+        if not code:
+            continue
+        ticker = f"{code}.T"
+
+        buy = row.get("margin_buy", 0) or 0
+        sell = row.get("margin_sell", 0) or 0
+        buy_chg = row.get("margin_buy_change", 0) or 0
+        sell_chg = row.get("margin_sell_change", 0) or 0
+        ratio = row.get("margin_ratio", 0) or 0
+
+        lookup[ticker] = {
+            "margin_buy": int(buy) if buy else 0,
+            "margin_sell": int(sell) if sell else 0,
+            "margin_buy_change": int(buy_chg) if buy_chg else 0,
+            "margin_sell_change": int(sell_chg) if sell_chg else 0,
+            "margin_ratio": round(float(ratio), 2) if ratio else None,
+        }
+    return lookup
+

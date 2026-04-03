@@ -1776,6 +1776,7 @@ def main():
 
     # ★ KABU+ から全銘柄の指標データを一括取得（1-2秒）
     kabuplus_info = {}
+    margin_lookup = {}
     try:
         import kabuplus_client as kp
         kp_id, kp_pw = kp.get_credentials()
@@ -1787,12 +1788,30 @@ def main():
                 print(f"  → KABU+ {len(kabuplus_info)}銘柄の指標データ取得完了")
             else:
                 print("  ⚠️ KABU+ データ取得失敗（休日の可能性）→ yfinance フォールバック")
+
+            # ★ 信用残高データ（週次）
+            print("📡 KABU+ 信用残高データ取得中...")
+            margin_df = kp.fetch_margin_data(kp_id, kp_pw)
+            if not margin_df.empty:
+                margin_lookup = kp.build_margin_lookup(margin_df)
+                print(f"  → 信用残高 {len(margin_lookup)}銘柄取得完了")
+            else:
+                print("  ⚠️ 信用残高データ取得失敗")
         else:
             print("  ⚠️ KABU+ 認証情報なし → yfinance フォールバック")
     except Exception as e:
         print(f"  ⚠️ KABU+ エラー: {e} → yfinance フォールバック")
 
     results, qualified, stock_history, shards = fetch_volume_data(universe, kabuplus_info=kabuplus_info)
+
+    # ★ 信用残高データを各銘柄の結果に統合
+    for ticker, result in results.items():
+        mg = margin_lookup.get(ticker, {})
+        result["margin_buy"] = mg.get("margin_buy", 0)
+        result["margin_sell"] = mg.get("margin_sell", 0)
+        result["margin_buy_change"] = mg.get("margin_buy_change", 0)
+        result["margin_sell_change"] = mg.get("margin_sell_change", 0)
+        result["margin_ratio"] = mg.get("margin_ratio")
 
     filtered = {k: v for k, v in results.items() if v.get("in_cap_range")}
     # 並び：LEVEL→MAScore→FlowScore

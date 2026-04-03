@@ -125,6 +125,21 @@ def _get_kabuplus_info(ticker: str) -> dict:
     """特定銘柄の KABU+ info を取得（キャッシュ済みルックアップ）"""
     return _load_kabuplus_info().get(ticker, {})
 
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _load_kabuplus_margin() -> dict:
+    """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築（1時間キャッシュ）"""
+    try:
+        uid, pwd = kp.get_credentials()
+        if not uid or not pwd:
+            return {}
+        margin_df = kp.fetch_margin_data(uid, pwd)
+        if margin_df.empty:
+            return {}
+        return kp.build_margin_lookup(margin_df)
+    except Exception:
+        return {}
+
 # ==========================================
 # カート操作のコールバック関数（即時反映用）
 # ==========================================
@@ -1189,6 +1204,32 @@ def _evaluate_stock_cached(ticker):
     if is_magma: icons_list.append("🦅")
     icons_str = " ".join(icons_list)
 
+    # ★ 信用需給データをKABU+から取得
+    margin_info = {}
+    try:
+        kp_margin = _load_kabuplus_margin()
+        margin_info = kp_margin.get(ticker, {})
+    except Exception:
+        pass
+
+    margin_buy = margin_info.get("margin_buy", 0)
+    margin_sell = margin_info.get("margin_sell", 0)
+    margin_ratio = margin_info.get("margin_ratio")
+    margin_buy_chg = margin_info.get("margin_buy_change", 0)
+    margin_sell_chg = margin_info.get("margin_sell_change", 0)
+
+    if margin_ratio is not None and margin_ratio > 0:
+        if margin_ratio < 1.0:
+            margin_str = f"📊 売り優勢（貸借倍率: {margin_ratio:.2f}倍）買残{margin_buy:,} / 売残{margin_sell:,}"
+        elif margin_ratio <= 3.0:
+            margin_str = f"📊 拮抗（貸借倍率: {margin_ratio:.2f}倍）買残{margin_buy:,} / 売残{margin_sell:,}"
+        else:
+            margin_str = f"📊 買残過多（貸借倍率: {margin_ratio:.2f}倍）買残{margin_buy:,} / 売残{margin_sell:,}"
+    elif margin_buy > 0 or margin_sell > 0:
+        margin_str = f"📊 買残{margin_buy:,} / 売残{margin_sell:,}"
+    else:
+        margin_str = "📊 データなし"
+
     return {
         "コード": code_only, "銘柄名": jp_name, "現在値": int(current_price),
         "時価総額": market_cap_oku, "時価総額_表示": formatted_mcap, "dividend_text": dividend_text,
@@ -1197,7 +1238,10 @@ def _evaluate_stock_cached(ticker):
         "recent_20_low": recent_20_low, "star_rating": star_rating, "star_desc": star_desc,
         "star_logic": star_logic, "intervention_name": intervention_name,
         "intervention_score": intervention_score, "intervention_comment": intervention_comment,
-        "safe_judgment": safe_judgment, "safe_explain": safe_explain, "icons_str": icons_str
+        "safe_judgment": safe_judgment, "safe_explain": safe_explain, "icons_str": icons_str,
+        "margin_str": margin_str, "margin_ratio": margin_ratio,
+        "margin_buy": margin_buy, "margin_sell": margin_sell,
+        "margin_buy_change": margin_buy_chg, "margin_sell_change": margin_sell_chg,
     }
 
 # 🚨 【呼び出し元関数】エラー時はキャッシュせずに例外を受け流す
@@ -1275,6 +1319,20 @@ def render_card(ticker: str, d: Dict):
             tags_html += f'<span class="tag-watch">要監視</span>'
         else:
             tags_html += f'<span class="tag-normal">{tag}</span>'
+
+    # ★ 信用需給タグを追加
+    margin_ratio = d.get("margin_ratio")
+    if margin_ratio is not None and margin_ratio > 0:
+        if margin_ratio < 1.0:
+            mg_color = "#22C55E"  # 緑（売り優勢=踏み上げ期待）
+            mg_label = f"📊 売り優勢({margin_ratio:.1f}倍)"
+        elif margin_ratio <= 3.0:
+            mg_color = "#6B7280"  # グレー（拮抗）
+            mg_label = f"📊 需給拮抗({margin_ratio:.1f}倍)"
+        else:
+            mg_color = "#EF4444"  # 赤（買い残過多=上値重い）
+            mg_label = f"📊 買残多({margin_ratio:.1f}倍)"
+        tags_html += f'<span class="tag-normal" style="color:{mg_color};border-color:{mg_color};font-weight:700;" title="貸借倍率（信用買残÷信用売残）">{mg_label}</span>'
 
     score_text = f"{flow_score}"
     level_text = f"LEVEL {level}" if level > 0 else "LEVEL -"
@@ -1656,6 +1714,21 @@ def show_main_page():
                                     st.write(f"時価総額: **{diag_data['時価総額_表示']}**")
                                     st.write(f"配当情報: **{diag_data['dividend_text']}**")
                                     st.write(f"商い熱量: **{diag_data['turnover_str']}**")
+                                    st.write(f"信用需給: **{diag_data.get('margin_str', 'データなし')}**")
+                                    
+                                    with st.expander("💡 信用需給（貸借倍率）の見方", key=f"diag_exp_margin_{code}"):
+                                        st.markdown("""
+                                        **貸借倍率 ＝ 信用買残 ÷ 信用売残**
+                                        
+                                        信用取引の需給バランスから、今後の株価の方向性を推測するための指標です。
+                                        
+                                        * **1.0倍未満【売り優勢】** 空売りが多い状態。株価上昇時に「踏み上げ」（ショートカバー）が発生し、急騰のトリガーになることがあります。
+                                        * **1.0〜3.0倍【拮抗】** 標準的な需給バランス。特段の偏りはなく、他の指標と合わせて判断します。
+                                        * **3.0倍超【買残過多】** 信用買いが過剰に積み上がっている状態。将来の売り圧力（返済売り）となり、上値が重くなりやすい傾向があります。
+                                        * **前週比の変化にも注目** 買残の急増は「個人投資家の過熱」、売残の急増は「機関投資家のヘッジ」を示唆することがあります。
+                                        
+                                        ※信用残高は毎週金曜日に更新されるデータです。
+                                        """)
                                     
                                     with st.expander("💡 商い熱量（株式回転率）とは？", key=f"diag_exp_turnover_{code}"):
                                         st.markdown("""
