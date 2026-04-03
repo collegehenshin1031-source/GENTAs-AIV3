@@ -112,8 +112,9 @@ yf_session = get_yf_session()
 # 【KABU+ 一括データ】診断用の銘柄情報キャッシュ
 # ==========================================
 @st.cache_data(ttl=900, show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _load_kabuplus_info() -> dict:
-    """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築"""
+    """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築（1時間キャッシュ）"""
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
@@ -122,7 +123,8 @@ def _load_kabuplus_info() -> dict:
         if merged.empty:
             return {}
         return kp.build_info_lookup(merged)
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ [_load_kabuplus_info] 取得失敗: {e}")
         return {}
 
 
@@ -528,31 +530,36 @@ def send_test_email(email: str, app_password: str) -> tuple[bool, str]:
 # ==========================================
 @st.cache_data(ttl=86400)
 def get_jpx_data():
-    try:
-        html_url = "https://www.jpx.co.jp/markets/statistics-equities/misc/01.html"
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        response = requests.get(html_url, headers=headers, timeout=10)
-        response.raise_for_status()
+    """
+    JPX上場銘柄一覧を取得し (name_map, code_list) を返す。
+    fetch_data.py の get_jpx_data() と同ロジックで統一。
+    HTMLスクレイピング失敗時は既知の固定直接URLへフォールバックする。
+    """
+    DIRECT_XLS_URL = (
+        "https://www.jpx.co.jp/markets/statistics-equities/misc/"
+        "tvdivq0000001vg2-att/data_j.xls"
+    )
+    headers = {
+        'User-Agent': (
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/124.0.0.0 Safari/537.36'
+        )
+    }
 
-        match = re.search(r'href="([^"]+data_j\.(?:xls|xlsx|csv))"', response.text, flags=re.IGNORECASE)
-        if not match:
+    def _parse(content: bytes, is_csv: bool = False):
+        try:
+            if is_csv:
+                df = pd.read_csv(io.BytesIO(content), encoding="utf-8")
+            else:
+                df = pd.read_excel(io.BytesIO(content))
+        except Exception as e:
+            print(f"⚠️ [app/get_jpx_data] Excel/CSVパース失敗: {e}")
             return {}, []
-
-        file_url = "https://www.jpx.co.jp" + match.group(1)
-        file_response = requests.get(file_url, headers=headers, timeout=15)
-        file_response.raise_for_status()
-
-        if file_url.lower().endswith(".csv"):
-            df = pd.read_csv(io.BytesIO(file_response.content), encoding="utf-8")
-        else:
-            df = pd.read_excel(io.BytesIO(file_response.content))
-
         if df is None or df.empty or len(df.columns) < 3:
             return {}, []
-
         df = df.copy()
         market_col = df.columns[3] if len(df.columns) >= 4 else None
-
         if market_col is not None:
             market_series = df[market_col].astype(str)
             market_mask = market_series.str.contains("プライム|スタンダード|グロース", na=False)
@@ -572,15 +579,50 @@ def get_jpx_data():
 
         codes = df_tickers.iloc[:, 1].apply(safe_code)
         names = df_tickers.iloc[:, 2].astype(str).str.strip()
-
         name_map = {}
         for code, name in zip(codes, names):
             if code and name and name.lower() != "nan":
                 name_map[code] = name
-
         return name_map, list(name_map.keys())
-    except Exception:
-        return {}, []
+
+    # Step 1: HTMLページから最新URLを取得
+    file_url = None
+    is_csv = False
+    try:
+        html_url = "https://www.jpx.co.jp/markets/statistics-equities/misc/01.html"
+        response = requests.get(html_url, headers=headers, timeout=15)
+        response.raise_for_status()
+        match = re.search(r'href="([^"]+data_j\.(?:xls|xlsx|csv))"', response.text, flags=re.IGNORECASE)
+        if match:
+            file_url = "https://www.jpx.co.jp" + match.group(1)
+            is_csv = file_url.lower().endswith(".csv")
+        else:
+            print("⚠️ [app/get_jpx_data] HTMLにdata_jリンクなし → 固定URLへフォールバック")
+    except Exception as e:
+        print(f"⚠️ [app/get_jpx_data] HTMLページ取得失敗: {e} → 固定URLへフォールバック")
+
+    if not file_url:
+        file_url = DIRECT_XLS_URL
+
+    # Step 2: ファイルダウンロード＆パース
+    try:
+        file_response = requests.get(file_url, headers=headers, timeout=30)
+        file_response.raise_for_status()
+        return _parse(file_response.content, is_csv=is_csv)
+    except Exception as e:
+        print(f"❌ [app/get_jpx_data] ダウンロード失敗 ({file_url}): {e}")
+
+    # Step 3: 固定URLで再試行
+    if file_url != DIRECT_XLS_URL:
+        try:
+            print(f"🔄 [app/get_jpx_data] 固定URLで再試行")
+            file_response = requests.get(DIRECT_XLS_URL, headers=headers, timeout=30)
+            file_response.raise_for_status()
+            return _parse(file_response.content)
+        except Exception as e:
+            print(f"❌ [app/get_jpx_data] 固定URLも失敗: {e}")
+
+    return {}, []
 
 
 @st.cache_data(ttl=86400)
