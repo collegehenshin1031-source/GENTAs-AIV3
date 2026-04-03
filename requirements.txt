@@ -8,6 +8,5 @@ xlrd>=2.0.0
 gspread>=5.10.0
 google-auth>=2.22.0
 plotly>=5.18.0
-yfinance
 numpy>=1.24.0
 requests
