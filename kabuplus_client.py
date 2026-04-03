@@ -44,10 +44,15 @@ PRICE_COLUMNS = {
 }
 INDICATOR_COLUMNS = {
     "SC": "code", "名称": "name", "市場": "market", "業種": "industry",
-    "配当利回り（予想）": "dividend_yield", "1株配当": "dividend_per_share",
-    "PER（予想）": "per", "PBR（実績）": "pbr", "EPS": "eps", "BPS": "bps",
-    "最低購入金額": "min_purchase", "単元株数": "unit_shares",
+    "配当利回り（予想）": "dividend_yield",
+    "1株配当（予想）": "dividend_per_share",   # 実CSVに合わせて修正
+    "PER（予想）": "per", "PBR（実績）": "pbr",
+    "EPS（予想）": "eps",                       # 実CSVに合わせて修正
+    "BPS（実績）": "bps",                       # 実CSVに合わせて修正
+    "最低購入額": "min_purchase",               # 実CSVに合わせて修正
+    "単元株": "unit_shares",                    # 実CSVに合わせて修正
     "発行済株式数": "shares_outstanding",
+    "時価総額（百万円）": "market_cap_m_ind",   # 指標ファイルにもある（参考）
 }
 OHLC_COLUMNS = {
     "SC": "code", "日付": "date_str",
@@ -56,10 +61,12 @@ OHLC_COLUMNS = {
     "売買代金": "trading_value",
 }
 MARGIN_COLUMNS = {
-    "SC": "code", "名称": "name", "市場": "market",
-    "信用買残": "margin_buy", "信用買残前週比": "margin_buy_change",
-    "信用売残": "margin_sell", "信用売残前週比": "margin_sell_change",
-    "貸借倍率": "margin_ratio",
+    "SC": "code",
+    "信用買残高":       "margin_buy",         # 実CSVに合わせて修正
+    "信用買残高 前週比": "margin_buy_change",   # 実CSVに合わせて修正
+    "信用売残高":       "margin_sell",         # 実CSVに合わせて修正
+    "信用売残高 前週比": "margin_sell_change",  # 実CSVに合わせて修正
+    "貸借倍率":        "margin_ratio",
 }
 
 
