@@ -1234,8 +1234,13 @@ def hash_ticker_shard_id(ticker: str) -> int:
 
 
 def get_all_listed_tickers_jpx() -> list[str]:
-    """JPX上場一覧（プライム・スタンダード・グロース）から Yahoo 形式ティッカー一覧を返す"""
-    d = get_jpx_data()
+    """JPX上場一覧（プライム・スタンダード・グロース）から Yahoo 形式ティッカー一覧を返す。
+
+    グローバルキャッシュ JPX_NAME_MAP が取得済みであればそれを優先し、
+    不要な再HTTPリクエストを避ける。
+    """
+    # JPX_NAME_MAP がすでに取得済みであればキャッシュを使う（余分なHTTP請求を防ぐ）
+    d = JPX_NAME_MAP if JPX_NAME_MAP else get_jpx_data()
     if not d:
         return []
     out: list[str] = []
@@ -1281,18 +1286,33 @@ def write_history_shards(shards: list[dict], updated_at: str) -> None:
 
 
 def get_jpx_data():
-    try:
-        html_url = "https://www.jpx.co.jp/markets/statistics-equities/misc/01.html"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        response = requests.get(html_url, headers=headers, timeout=10)
-        response.raise_for_status()
-        match = re.search(r'href="([^"]+data_j\.xls)"', response.text)
-        if not match:
-            return {}
+    """
+    JPX上場銘柄一覧（プライム・スタンダード・グロース）を取得し {コード: 銘柄名} を返す。
 
-        file_url = "https://www.jpx.co.jp" + match.group(1)
-        xls_response = requests.get(file_url, headers=headers, timeout=10)
-        xls_response.raise_for_status()
+    修正内容 (2025-04):
+      [Fix1] 正規表現を data_j[.]xlsx? に変更 → .xls / .xlsx 両対応
+      [Fix2] 市場区分フィルタを str.contains() に変更
+             (実際の列値は "プライム（内国株式）" 等であり完全一致では空になる)
+      [Fix3] エラーを標準出力へ出力し原因を把握できるようにした
+      [Fix4] HTMLスクレイピング失敗時に既知の直接URLへフォールバック
+    """
+
+    # ---- 既知の固定 URL（フォールバック用） ----
+    DIRECT_XLS_URL = (
+        "https://www.jpx.co.jp/markets/statistics-equities/misc/"
+        "tvdivq0000001vg2-att/data_j.xls"
+    )
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        )
+    }
+
+    def _parse_jpx_excel(content: bytes) -> dict:
+        """バイト列から銘柄コード→銘柄名 dict を生成する共通パーサ"""
 
         def _jpx_code_cell(v):
             """Excel が数値化した銘柄（7203.0）と英字銘柄（151A）の両方を文字列で保持"""
@@ -1303,14 +1323,66 @@ def get_jpx_data():
                 return s[:-2]
             return s
 
-        df = pd.read_excel(io.BytesIO(xls_response.content))
+        df = pd.read_excel(io.BytesIO(content))
         df.iloc[:, 1] = df.iloc[:, 1].map(_jpx_code_cell)
-        df_tickers = df[df.iloc[:, 3].isin(["プライム", "スタンダード", "グロース"])]
+
+        # [Fix2] 列値は "プライム（内国株式）" 等なので contains() でマッチ
+        market_col = df.iloc[:, 3].astype(str)
+        mask = market_col.str.contains("プライム|スタンダード|グロース", na=False)
+        df_tickers = df[mask]
+
+        if df_tickers.empty:
+            # デバッグ用: 実際の列値を出力して原因把握を容易にする
+            print(f"⚠️ [get_jpx_data] 市場区分フィルタ後が空。"
+                  f"列3のユニーク値 (先頭10件): {market_col.unique()[:10].tolist()}")
+            return {}
+
         codes = df_tickers.iloc[:, 1].astype(str).str.strip()
         codes = codes[codes != ""]
-        return dict(zip(codes, df_tickers.iloc[:, 2]))
-    except Exception:
-        return {}
+        result = dict(zip(codes, df_tickers.iloc[:, 2]))
+        print(f"✅ [get_jpx_data] JPX銘柄一覧取得成功: {len(result)}銘柄")
+        return result
+
+    # ---- Step 1: HTMLページをパースして最新 XLS/XLSX URL を取得 ----
+    file_url = None
+    try:
+        html_url = "https://www.jpx.co.jp/markets/statistics-equities/misc/01.html"
+        response = requests.get(html_url, headers=headers, timeout=15)
+        response.raise_for_status()
+        # [Fix1] .xls と .xlsx 両方にマッチするよう x? を追加
+        match = re.search(r'href="([^"]+data_j\.xlsx?)"', response.text)
+        if match:
+            file_url = "https://www.jpx.co.jp" + match.group(1)
+            print(f"📄 [get_jpx_data] HTMLから XLS URL 取得: {file_url}")
+        else:
+            print("⚠️ [get_jpx_data] HTMLページに data_j.xls/xlsx リンクが見つかりません。"
+                  "直接 URL にフォールバックします。")
+    except Exception as e:
+        print(f"⚠️ [get_jpx_data] HTMLページ取得失敗: {e}。直接 URL にフォールバックします。")
+
+    # [Fix4] Step 1 失敗時は既知の固定 URL を使う
+    if not file_url:
+        file_url = DIRECT_XLS_URL
+
+    # ---- Step 2: XLS/XLSX ファイルをダウンロードしてパース ----
+    try:
+        xls_response = requests.get(file_url, headers=headers, timeout=30)
+        xls_response.raise_for_status()
+        return _parse_jpx_excel(xls_response.content)
+    except Exception as e:
+        print(f"❌ [get_jpx_data] XLSダウンロード失敗 ({file_url}): {e}")
+
+    # ---- Step 3: Step 2 も失敗した場合、固定 URL で再試行（Step1 が別 URL だった場合） ----
+    if file_url != DIRECT_XLS_URL:
+        try:
+            print(f"🔄 [get_jpx_data] 固定 URL で再試行: {DIRECT_XLS_URL}")
+            xls_response = requests.get(DIRECT_XLS_URL, headers=headers, timeout=30)
+            xls_response.raise_for_status()
+            return _parse_jpx_excel(xls_response.content)
+        except Exception as e:
+            print(f"❌ [get_jpx_data] 固定 URL も失敗: {e}")
+
+    return {}
 
 JPX_NAME_MAP = get_jpx_data()
 
