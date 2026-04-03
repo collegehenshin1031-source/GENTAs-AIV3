@@ -131,7 +131,7 @@ def _get_kabuplus_info(ticker: str) -> dict:
     return _load_kabuplus_info().get(ticker, {})
 
 
-@st.cache_data(ttl=3600, show_spinner=False)
+@st.cache_data(ttl=300, show_spinner=False)
 def _load_kabuplus_margin() -> dict:
     """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築（1時間キャッシュ）"""
     try:
