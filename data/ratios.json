@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-03 12:41:50",
+  "updated_at": "2026-04-03 14:50:04",
   "date": "2026-04-03",
   "market_cap_range": "300億〜2000億円",
   "total_count": 69,
@@ -51,7 +51,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.11
     },
     "8255.T": {
       "name": "アクシアル リテイリング",
@@ -90,7 +90,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "8173.T": {
       "name": "上新電機",
@@ -132,7 +132,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.01
     },
     "8125.T": {
       "name": "ワキタ",
@@ -173,7 +173,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "9824.T": {
       "name": "泉州電業",
@@ -214,7 +214,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "9832.T": {
       "name": "オートバックスセブン",
@@ -255,7 +255,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.04
     },
     "8059.T": {
       "name": "第一実業",
@@ -294,7 +294,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 11.05
     },
     "9757.T": {
       "name": "船井総研ホールディングス",
@@ -333,7 +333,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.57
     },
     "8117.T": {
       "name": "中央自動車工業",
@@ -372,7 +372,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.29
     },
     "9536.T": {
       "name": "西部ガスホールディングス",
@@ -413,7 +413,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "8708.T": {
       "name": "藍澤證券",
@@ -440,7 +440,7 @@
         "range_compression": 0.0,
         "lower_shadow": 46.4
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 50.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -450,13 +450,14 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.61
     },
     "8344.T": {
       "name": "山形銀行",
@@ -497,7 +498,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.08
     },
     "4384.T": {
       "name": "ラクスル",
@@ -538,7 +539,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.18
     },
     "9534.T": {
       "name": "北海道ガス",
@@ -579,7 +580,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.59
     },
     "9324.T": {
       "name": "安田倉庫",
@@ -618,7 +619,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.1
     },
     "2292.T": {
       "name": "S FOODS",
@@ -659,7 +660,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 19.0
     },
     "9081.T": {
       "name": "神奈川中央交通",
@@ -686,7 +687,7 @@
         "range_compression": 0.0,
         "lower_shadow": 59.5
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 50.4,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -696,13 +697,14 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.06
     },
     "8550.T": {
       "name": "栃木銀行",
@@ -743,7 +745,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.63
     },
     "6463.T": {
       "name": "TPR",
@@ -782,7 +784,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.11
     },
     "8237.T": {
       "name": "松屋",
@@ -821,7 +823,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.2
     },
     "9755.T": {
       "name": "応用地質",
@@ -862,7 +864,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.92
     },
     "8074.T": {
       "name": "ユアサ商事",
@@ -903,7 +905,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.05
     },
     "2613.T": {
       "name": "J-オイルミルズ",
@@ -946,7 +948,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.04
     },
     "9902.T": {
       "name": "日伝",
@@ -987,7 +989,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.41
     },
     "8160.T": {
       "name": "木曽路",
@@ -1014,7 +1016,7 @@
         "range_compression": 0.0,
         "lower_shadow": 34.4
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 50.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -1024,13 +1026,14 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.01
     },
     "6363.T": {
       "name": "酉島製作所",
@@ -1072,7 +1075,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.51
     },
     "9052.T": {
       "name": "山陽電気鉄道",
@@ -1113,7 +1116,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.04
     },
     "8934.T": {
       "name": "サンフロンティア不動産",
@@ -1154,7 +1157,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.33
     },
     "1419.T": {
       "name": "タマホーム",
@@ -1193,7 +1196,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.22
     },
     "2379.T": {
       "name": "ディップ",
@@ -1234,7 +1237,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.79
     },
     "9619.T": {
       "name": "イチネンホールディングス",
@@ -1275,7 +1278,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 9.9
     },
     "6349.T": {
       "name": "小森コーポレーション",
@@ -1316,7 +1319,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.05
     },
     "1976.T": {
       "name": "明星工業",
@@ -1355,7 +1358,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.12
     },
     "8079.T": {
       "name": "正栄食品工業",
@@ -1397,7 +1400,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.65
     },
     "7250.T": {
       "name": "太平洋工業",
@@ -1438,7 +1441,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.39
     },
     "8346.T": {
       "name": "東邦銀行",
@@ -1479,7 +1482,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.21
     },
     "9621.T": {
       "name": "建設技術研究所",
@@ -1520,7 +1523,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.02
     },
     "3668.T": {
       "name": "コロプラ",
@@ -1561,7 +1564,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.34
     },
     "9678.T": {
       "name": "カナモト",
@@ -1600,7 +1603,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.83
     },
     "8167.T": {
       "name": "リテールパートナーズ",
@@ -1641,7 +1644,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.29
     },
     "9010.T": {
       "name": "富士急行",
@@ -1680,7 +1683,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.07
     },
     "3962.T": {
       "name": "チェンジホールディングス",
@@ -1721,7 +1724,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.57
     },
     "7244.T": {
       "name": "市光工業",
@@ -1760,7 +1763,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.81
     },
     "8285.T": {
       "name": "三谷産業",
@@ -1801,7 +1804,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.3
     },
     "2211.T": {
       "name": "不二家",
@@ -1842,7 +1845,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.82
     },
     "8511.T": {
       "name": "日本証券金融",
@@ -1883,7 +1886,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.11
     },
     "1926.T": {
       "name": "ライト工業",
@@ -1924,7 +1927,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.44
     },
     "8624.T": {
       "name": "いちよし証券",
@@ -1965,7 +1968,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.61
     },
     "9742.T": {
       "name": "アイネス",
@@ -2006,7 +2009,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.16
     },
     "2108.T": {
       "name": "日本甜菜製糖",
@@ -2048,7 +2051,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.8
     },
     "9928.T": {
       "name": "ミロク情報サービス",
@@ -2089,7 +2092,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.54
     },
     "8613.T": {
       "name": "丸三証券",
@@ -2131,7 +2134,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.29
     },
     "6997.T": {
       "name": "日本ケミコン",
@@ -2172,7 +2175,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.52
     },
     "9682.T": {
       "name": "DTS",
@@ -2211,7 +2214,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.73
     },
     "9622.T": {
       "name": "スペース",
@@ -2252,7 +2255,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 28.21
     },
     "8803.T": {
       "name": "平和不動産",
@@ -2291,7 +2294,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.07
     },
     "6369.T": {
       "name": "トーヨーカネツ",
@@ -2333,7 +2336,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.12
     },
     "2462.T": {
       "name": "ライク",
@@ -2372,7 +2375,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.15
     },
     "8860.T": {
       "name": "フジ住宅",
@@ -2413,7 +2416,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.12
     },
     "4431.T": {
       "name": "スマレジ",
@@ -2454,7 +2457,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.55
     },
     "3836.T": {
       "name": "アバント",
@@ -2495,7 +2498,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.67
     },
     "8558.T": {
       "name": "東和銀行",
@@ -2534,7 +2537,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.05
     },
     "6677.T": {
       "name": "エスケーエレクトロニクス",
@@ -2575,7 +2578,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 113.35
     },
     "9746.T": {
       "name": "TKC",
@@ -2616,7 +2619,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 31.56
     },
     "3994.T": {
       "name": "マネーフォワード",
@@ -2655,7 +2658,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.32
     },
     "2910.T": {
       "name": "ロック・フィールド",
@@ -2696,7 +2699,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "1946.T": {
       "name": "トーエネック",
@@ -2735,7 +2738,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 11.65
     },
     "1835.T": {
       "name": "東鉄工業",
@@ -2776,7 +2779,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.0
     },
     "3843.T": {
       "name": "フリービット",
@@ -2818,7 +2821,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.01
     }
   },
   "all_data": {
@@ -2861,7 +2864,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.11
     },
     "8255.T": {
       "name": "アクシアル リテイリング",
@@ -2900,7 +2903,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "8173.T": {
       "name": "上新電機",
@@ -2942,7 +2945,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.01
     },
     "8125.T": {
       "name": "ワキタ",
@@ -2983,7 +2986,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "9824.T": {
       "name": "泉州電業",
@@ -3024,7 +3027,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "9832.T": {
       "name": "オートバックスセブン",
@@ -3065,7 +3068,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.04
     },
     "8059.T": {
       "name": "第一実業",
@@ -3104,7 +3107,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 11.05
     },
     "9757.T": {
       "name": "船井総研ホールディングス",
@@ -3143,7 +3146,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.57
     },
     "8117.T": {
       "name": "中央自動車工業",
@@ -3182,7 +3185,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.29
     },
     "6474.T": {
       "name": "不二越",
@@ -3221,7 +3224,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 7.9
     },
     "9536.T": {
       "name": "西部ガスホールディングス",
@@ -3262,7 +3265,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "8708.T": {
       "name": "藍澤證券",
@@ -3289,7 +3292,7 @@
         "range_compression": 0.0,
         "lower_shadow": 46.4
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 50.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3299,13 +3302,14 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.61
     },
     "8344.T": {
       "name": "山形銀行",
@@ -3346,7 +3350,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.08
     },
     "1879.T": {
       "name": "新日本建設",
@@ -3387,7 +3391,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 121.7
     },
     "4384.T": {
       "name": "ラクスル",
@@ -3428,7 +3432,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.18
     },
     "9534.T": {
       "name": "北海道ガス",
@@ -3469,7 +3473,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.59
     },
     "9324.T": {
       "name": "安田倉庫",
@@ -3508,7 +3512,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.1
     },
     "2292.T": {
       "name": "S FOODS",
@@ -3549,7 +3553,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 19.0
     },
     "9081.T": {
       "name": "神奈川中央交通",
@@ -3576,7 +3580,7 @@
         "range_compression": 0.0,
         "lower_shadow": 59.5
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 50.4,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3586,13 +3590,14 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.06
     },
     "8219.T": {
       "name": "青山商事",
@@ -3634,7 +3639,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.16
     },
     "8550.T": {
       "name": "栃木銀行",
@@ -3675,7 +3680,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.63
     },
     "6463.T": {
       "name": "TPR",
@@ -3714,7 +3719,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.11
     },
     "8345.T": {
       "name": "岩手銀行",
@@ -3755,7 +3760,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 22.82
     },
     "9842.T": {
       "name": "アークランズ",
@@ -3796,7 +3801,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.26
     },
     "8237.T": {
       "name": "松屋",
@@ -3835,7 +3840,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.2
     },
     "9755.T": {
       "name": "応用地質",
@@ -3876,7 +3881,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.92
     },
     "8074.T": {
       "name": "ユアサ商事",
@@ -3917,7 +3922,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.05
     },
     "2613.T": {
       "name": "J-オイルミルズ",
@@ -3960,7 +3965,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.04
     },
     "9902.T": {
       "name": "日伝",
@@ -4001,7 +4006,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.41
     },
     "8160.T": {
       "name": "木曽路",
@@ -4028,7 +4033,7 @@
         "range_compression": 0.0,
         "lower_shadow": 34.4
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 50.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -4038,13 +4043,14 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.01
     },
     "6340.T": {
       "name": "澁谷工業",
@@ -4085,7 +4091,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.09
     },
     "4569.T": {
       "name": "キョーリン製薬ホールディングス",
@@ -4124,7 +4130,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.17
     },
     "6363.T": {
       "name": "酉島製作所",
@@ -4166,7 +4172,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.51
     },
     "6966.T": {
       "name": "三井ハイテック",
@@ -4207,7 +4213,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.33
     },
     "9052.T": {
       "name": "山陽電気鉄道",
@@ -4248,7 +4254,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.04
     },
     "8934.T": {
       "name": "サンフロンティア不動産",
@@ -4289,7 +4295,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.33
     },
     "9166.T": {
       "name": "GENDA",
@@ -4330,7 +4336,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.28
     },
     "8595.T": {
       "name": "ジャフコ グループ",
@@ -4371,7 +4377,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.0
     },
     "1419.T": {
       "name": "タマホーム",
@@ -4410,7 +4416,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.22
     },
     "2379.T": {
       "name": "ディップ",
@@ -4451,7 +4457,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.79
     },
     "6104.T": {
       "name": "芝浦機械",
@@ -4492,7 +4498,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.22
     },
     "9619.T": {
       "name": "イチネンホールディングス",
@@ -4533,7 +4539,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 9.9
     },
     "6349.T": {
       "name": "小森コーポレーション",
@@ -4574,7 +4580,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.05
     },
     "1976.T": {
       "name": "明星工業",
@@ -4613,7 +4619,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.12
     },
     "8079.T": {
       "name": "正栄食品工業",
@@ -4655,7 +4661,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.65
     },
     "6284.T": {
       "name": "日精エー・エス・ビー機械",
@@ -4696,7 +4702,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.85
     },
     "9699.T": {
       "name": "西尾レントオール",
@@ -4737,7 +4743,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.0
     },
     "2004.T": {
       "name": "昭和産業",
@@ -4776,7 +4782,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.62
     },
     "7250.T": {
       "name": "太平洋工業",
@@ -4817,7 +4823,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.39
     },
     "4559.T": {
       "name": "ゼリア新薬工業",
@@ -4856,7 +4862,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.14
     },
     "8346.T": {
       "name": "東邦銀行",
@@ -4897,7 +4903,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.21
     },
     "8387.T": {
       "name": "四国銀行",
@@ -4938,7 +4944,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.7
     },
     "8337.T": {
       "name": "千葉興業銀行",
@@ -4979,7 +4985,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 26.72
     },
     "9621.T": {
       "name": "建設技術研究所",
@@ -5020,7 +5026,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.02
     },
     "3668.T": {
       "name": "コロプラ",
@@ -5061,7 +5067,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.34
     },
     "8399.T": {
       "name": "琉球銀行",
@@ -5102,7 +5108,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 25.75
     },
     "1870.T": {
       "name": "矢作建設工業",
@@ -5143,7 +5149,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 47.83
     },
     "6877.T": {
       "name": "OBARA GROUP",
@@ -5184,7 +5190,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.83
     },
     "2220.T": {
       "name": "亀田製菓",
@@ -5226,7 +5232,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.7
     },
     "9678.T": {
       "name": "カナモト",
@@ -5265,7 +5271,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.83
     },
     "8167.T": {
       "name": "リテールパートナーズ",
@@ -5306,7 +5312,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.29
     },
     "8841.T": {
       "name": "テーオーシー",
@@ -5347,7 +5353,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.1
     },
     "6282.T": {
       "name": "オイレス工業",
@@ -5389,7 +5395,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "9010.T": {
       "name": "富士急行",
@@ -5428,7 +5434,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.07
     },
     "3962.T": {
       "name": "チェンジホールディングス",
@@ -5469,7 +5475,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.57
     },
     "8343.T": {
       "name": "秋田銀行",
@@ -5510,7 +5516,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.27
     },
     "9729.T": {
       "name": "トーカイ",
@@ -5551,7 +5557,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.15
     },
     "7244.T": {
       "name": "市光工業",
@@ -5590,7 +5596,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.81
     },
     "8276.T": {
       "name": "平和堂",
@@ -5629,7 +5635,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.43
     },
     "8285.T": {
       "name": "三谷産業",
@@ -5670,7 +5676,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.3
     },
     "9997.T": {
       "name": "ベルーナ",
@@ -5711,7 +5717,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.26
     },
     "2211.T": {
       "name": "不二家",
@@ -5752,7 +5758,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.82
     },
     "8511.T": {
       "name": "日本証券金融",
@@ -5793,7 +5799,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.11
     },
     "8395.T": {
       "name": "佐賀銀行",
@@ -5834,7 +5840,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 25.76
     },
     "9603.T": {
       "name": "エイチ・アイ・エス",
@@ -5875,7 +5881,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 16.79
     },
     "9304.T": {
       "name": "澁澤倉庫",
@@ -5916,7 +5922,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.06
     },
     "1926.T": {
       "name": "ライト工業",
@@ -5957,7 +5963,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.44
     },
     "8131.T": {
       "name": "ミツウロコグループホールディングス",
@@ -5996,7 +6002,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.1
     },
     "7241.T": {
       "name": "フタバ産業",
@@ -6037,7 +6043,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.94
     },
     "3046.T": {
       "name": "ジンズホールディングス",
@@ -6078,7 +6084,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 39.64
     },
     "8624.T": {
       "name": "いちよし証券",
@@ -6119,7 +6125,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.61
     },
     "4565.T": {
       "name": "そーせいグループ",
@@ -6161,7 +6167,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 31.96
     },
     "2117.T": {
       "name": "ウェルネオシュガー",
@@ -6202,7 +6208,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.1
     },
     "8362.T": {
       "name": "福井銀行",
@@ -6243,7 +6249,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.47
     },
     "9742.T": {
       "name": "アイネス",
@@ -6284,7 +6290,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.16
     },
     "2108.T": {
       "name": "日本甜菜製糖",
@@ -6326,7 +6332,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.8
     },
     "6727.T": {
       "name": "ワコム",
@@ -6367,7 +6373,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 15.27
     },
     "8393.T": {
       "name": "宮崎銀行",
@@ -6408,7 +6414,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 15.44
     },
     "9928.T": {
       "name": "ミロク情報サービス",
@@ -6449,7 +6455,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.54
     },
     "6345.T": {
       "name": "アイチコーポレーション",
@@ -6490,7 +6496,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.09
     },
     "9517.T": {
       "name": "イーレックス",
@@ -6532,7 +6538,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.48
     },
     "6287.T": {
       "name": "サトーホールディングス",
@@ -6573,7 +6579,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.05
     },
     "6332.T": {
       "name": "月島ホールディングス",
@@ -6612,7 +6618,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.82
     },
     "2208.T": {
       "name": "ブルボン",
@@ -6694,7 +6700,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 83.07
     },
     "6351.T": {
       "name": "鶴見製作所",
@@ -6733,7 +6739,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.53
     },
     "9882.T": {
       "name": "イエローハット",
@@ -6774,7 +6780,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.15
     },
     "8613.T": {
       "name": "丸三証券",
@@ -6816,7 +6822,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.29
     },
     "8541.T": {
       "name": "愛媛銀行",
@@ -6857,7 +6863,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.78
     },
     "6961.T": {
       "name": "エンプラス",
@@ -6898,7 +6904,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.24
     },
     "6997.T": {
       "name": "日本ケミコン",
@@ -6939,7 +6945,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.52
     },
     "9519.T": {
       "name": "レノバ",
@@ -6981,7 +6987,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.86
     },
     "8159.T": {
       "name": "立花エレテック",
@@ -7022,7 +7028,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.72
     },
     "9682.T": {
       "name": "DTS",
@@ -7061,7 +7067,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.73
     },
     "9622.T": {
       "name": "スペース",
@@ -7102,7 +7108,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 28.21
     },
     "2281.T": {
       "name": "プリマハム",
@@ -7141,7 +7147,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.94
     },
     "2053.T": {
       "name": "中部飼料",
@@ -7182,7 +7188,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.42
     },
     "6458.T": {
       "name": "新晃工業",
@@ -7223,7 +7229,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.42
     },
     "8803.T": {
       "name": "平和不動産",
@@ -7262,7 +7268,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.07
     },
     "3167.T": {
       "name": "TOKAIホールディングス",
@@ -7301,7 +7307,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.01
     },
     "1939.T": {
       "name": "四電工",
@@ -7342,7 +7348,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.21
     },
     "6420.T": {
       "name": "フクシマガリレイ",
@@ -7383,7 +7389,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.22
     },
     "1982.T": {
       "name": "日比谷総合設備",
@@ -7424,7 +7430,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.87
     },
     "6929.T": {
       "name": "日本セラミック",
@@ -7465,7 +7471,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.26
     },
     "6914.T": {
       "name": "オプテックスグループ",
@@ -7506,7 +7512,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.1
     },
     "8508.T": {
       "name": "Jトラスト",
@@ -7547,7 +7553,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 62.39
     },
     "7246.T": {
       "name": "プレス工業",
@@ -7588,7 +7594,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.22
     },
     "6369.T": {
       "name": "トーヨーカネツ",
@@ -7630,7 +7636,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.12
     },
     "1945.T": {
       "name": "東京エネシス",
@@ -7671,7 +7677,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.05
     },
     "6750.T": {
       "name": "エレコム",
@@ -7712,7 +7718,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.37
     },
     "2462.T": {
       "name": "ライク",
@@ -7751,7 +7757,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.15
     },
     "8860.T": {
       "name": "フジ住宅",
@@ -7792,7 +7798,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.12
     },
     "6866.T": {
       "name": "日置電機",
@@ -7833,7 +7839,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.54
     },
     "8132.T": {
       "name": "シナネンホールディングス",
@@ -7874,7 +7880,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.1
     },
     "4549.T": {
       "name": "栄研化学",
@@ -7915,7 +7921,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.95
     },
     "9692.T": {
       "name": "シーイーシー",
@@ -7956,7 +7962,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 50.26
     },
     "6804.T": {
       "name": "ホシデン",
@@ -7995,7 +8001,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 14.63
     },
     "4431.T": {
       "name": "スマレジ",
@@ -8036,7 +8042,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.55
     },
     "1887.T": {
       "name": "日本国土開発",
@@ -8075,7 +8081,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 16.1
     },
     "2003.T": {
       "name": "日東富士製粉",
@@ -8117,7 +8123,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.84
     },
     "6996.T": {
       "name": "ニチコン",
@@ -8156,7 +8162,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.31
     },
     "3836.T": {
       "name": "アバント",
@@ -8197,7 +8203,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.67
     },
     "8707.T": {
       "name": "岩井コスモホールディングス",
@@ -8238,7 +8244,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.18
     },
     "6330.T": {
       "name": "東洋エンジニアリング",
@@ -8277,7 +8283,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.01
     },
     "6480.T": {
       "name": "日本トムソン",
@@ -8318,7 +8324,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.88
     },
     "6143.T": {
       "name": "ソディック",
@@ -8359,7 +8365,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.51
     },
     "8864.T": {
       "name": "空港施設",
@@ -8400,7 +8406,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 28.56
     },
     "8360.T": {
       "name": "山梨中央銀行",
@@ -8441,7 +8447,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.42
     },
     "2791.T": {
       "name": "大黒天物産",
@@ -8482,7 +8488,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.97
     },
     "2918.T": {
       "name": "わらべや日洋ホールディングス",
@@ -8523,7 +8529,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 16.97
     },
     "2175.T": {
       "name": "エス・エム・エス",
@@ -8564,7 +8570,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.48
     },
     "6118.T": {
       "name": "アイダエンジニアリング",
@@ -8605,7 +8611,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.94
     },
     "8558.T": {
       "name": "東和銀行",
@@ -8644,7 +8650,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.05
     },
     "2908.T": {
       "name": "フジッコ",
@@ -8685,7 +8691,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.28
     },
     "9974.T": {
       "name": "ベルク",
@@ -8726,7 +8732,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 7.06
     },
     "1967.T": {
       "name": "ヤマト",
@@ -8767,7 +8773,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 17.17
     },
     "6677.T": {
       "name": "エスケーエレクトロニクス",
@@ -8808,10 +8814,10 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 113.35
     },
     "3993.T": {
-      "name": "(株)ＰＫＳＨＡ　Ｔｅｃｈｎｏｌｏｇｙ",
+      "name": "PKSHA Technology",
       "price": 2840.0,
       "volume": 345900,
       "avg_volume": 494799,
@@ -8849,7 +8855,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.63
     },
     "1882.T": {
       "name": "東亜道路工業",
@@ -8890,7 +8896,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.38
     },
     "8551.T": {
       "name": "北日本銀行",
@@ -8931,7 +8937,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.63
     },
     "6800.T": {
       "name": "ヨコオ",
@@ -8972,7 +8978,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.75
     },
     "1822.T": {
       "name": "大豊建設",
@@ -9013,7 +9019,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.2
     },
     "8566.T": {
       "name": "リコーリース",
@@ -9055,7 +9061,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "8179.T": {
       "name": "ロイヤルホールディングス",
@@ -9094,7 +9100,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.68
     },
     "7296.T": {
       "name": "エフ・シー・シー",
@@ -9133,7 +9139,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.42
     },
     "1720.T": {
       "name": "東急建設",
@@ -9172,7 +9178,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.49
     },
     "6339.T": {
       "name": "新東工業",
@@ -9213,7 +9219,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.59
     },
     "6364.T": {
       "name": "北越工業",
@@ -9254,7 +9260,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.35
     },
     "3076.T": {
       "name": "あいホールディングス",
@@ -9295,7 +9301,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.18
     },
     "8596.T": {
       "name": "九州リースサービス",
@@ -9334,7 +9340,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 27.79
     },
     "6145.T": {
       "name": "日特エンジニアリング",
@@ -9375,7 +9381,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 112.93
     },
     "6272.T": {
       "name": "レオン自動機",
@@ -9416,7 +9422,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 29.3
     },
     "9856.T": {
       "name": "ケーユーホールディングス",
@@ -9457,7 +9463,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.72
     },
     "1899.T": {
       "name": "福田組",
@@ -9496,7 +9502,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.83
     },
     "9746.T": {
       "name": "TKC",
@@ -9537,7 +9543,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 31.56
     },
     "6412.T": {
       "name": "平和",
@@ -9578,7 +9584,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.29
     },
     "6807.T": {
       "name": "日本航空電子工業",
@@ -9619,7 +9625,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.0
     },
     "2695.T": {
       "name": "くら寿司",
@@ -9658,7 +9664,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.81
     },
     "6381.T": {
       "name": "アネスト岩田",
@@ -9697,7 +9703,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.87
     },
     "3697.T": {
       "name": "SHIFT",
@@ -9738,7 +9744,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 30.43
     },
     "1852.T": {
       "name": "浅沼組",
@@ -9779,7 +9785,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.22
     },
     "8218.T": {
       "name": "コメリ",
@@ -9818,7 +9824,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.11
     },
     "9889.T": {
       "name": "JBCCホールディングス",
@@ -9859,7 +9865,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 76.15
     },
     "2915.T": {
       "name": "ケンコーマヨネーズ",
@@ -9900,7 +9906,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.03
     },
     "2124.T": {
       "name": "ジェイエイシーリクルートメント",
@@ -9941,7 +9947,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.09
     },
     "9743.T": {
       "name": "丹青社",
@@ -9982,7 +9988,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 22.12
     },
     "4552.T": {
       "name": "JCRファーマ",
@@ -10023,7 +10029,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.56
     },
     "9715.T": {
       "name": "トランスコスモス",
@@ -10064,7 +10070,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.63
     },
     "1975.T": {
       "name": "朝日工業社",
@@ -10103,7 +10109,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 38.73
     },
     "1929.T": {
       "name": "日特建設",
@@ -10144,7 +10150,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.57
     },
     "3994.T": {
       "name": "マネーフォワード",
@@ -10183,7 +10189,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.32
     },
     "2602.T": {
       "name": "日清オイリオグループ",
@@ -10225,7 +10231,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.14
     },
     "6855.T": {
       "name": "日本電子材料",
@@ -10266,7 +10272,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 22.5
     },
     "8585.T": {
       "name": "オリエントコーポレーション",
@@ -10307,7 +10313,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.51
     },
     "1871.T": {
       "name": "ピーエス三菱",
@@ -10348,7 +10354,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.19
     },
     "8200.T": {
       "name": "リンガーハット",
@@ -10389,7 +10395,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.19
     },
     "8935.T": {
       "name": "FJネクストホールディングス",
@@ -10428,7 +10434,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.98
     },
     "1921.T": {
       "name": "巴コーポレーション",
@@ -10467,7 +10473,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.42
     },
     "6908.T": {
       "name": "イリソ電子工業",
@@ -10508,7 +10514,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.68
     },
     "6486.T": {
       "name": "イーグル工業",
@@ -10547,7 +10553,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.19
     },
     "2910.T": {
       "name": "ロック・フィールド",
@@ -10588,7 +10594,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "3176.T": {
       "name": "三洋貿易",
@@ -10627,7 +10633,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 32.86
     },
     "9672.T": {
       "name": "東京都競馬",
@@ -10668,7 +10674,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.44
     },
     "1723.T": {
       "name": "日本電技",
@@ -10750,7 +10756,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "9906.T": {
       "name": "藤井産業",
@@ -10832,7 +10838,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 23.19
     },
     "4548.T": {
       "name": "生化学工業",
@@ -10871,7 +10877,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.39
     },
     "8338.T": {
       "name": "筑波銀行",
@@ -10912,7 +10918,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.37
     },
     "8137.T": {
       "name": "サンワテクノス",
@@ -10951,7 +10957,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.05
     },
     "6817.T": {
       "name": "スミダコーポレーション",
@@ -10992,7 +10998,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 253.1
     },
     "8141.T": {
       "name": "新光商事",
@@ -11033,7 +11039,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.3
     },
     "8584.T": {
       "name": "ジャックス",
@@ -11074,7 +11080,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.42
     },
     "4478.T": {
       "name": "フリー",
@@ -11115,7 +11121,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.63
     },
     "9629.T": {
       "name": "ピー・シー・エー",
@@ -11157,7 +11163,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.32
     },
     "2612.T": {
       "name": "かどや製油",
@@ -11238,7 +11244,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 18.9
     },
     "9110.T": {
       "name": "NSユナイテッド海運",
@@ -11279,7 +11285,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.45
     },
     "6489.T": {
       "name": "前澤工業",
@@ -11320,7 +11326,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 9.68
     },
     "4577.T": {
       "name": "ダイト",
@@ -11359,7 +11365,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.41
     },
     "2492.T": {
       "name": "インフォマート",
@@ -11398,7 +11404,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.7
     },
     "1946.T": {
       "name": "トーエネック",
@@ -11437,7 +11443,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 11.65
     },
     "9837.T": {
       "name": "モリト",
@@ -11476,7 +11482,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.21
     },
     "6331.T": {
       "name": "三菱化工機",
@@ -11517,7 +11523,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.52
     },
     "9739.T": {
       "name": "NSW",
@@ -11599,7 +11605,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.89
     },
     "8698.T": {
       "name": "マネックスグループ",
@@ -11640,7 +11646,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.31
     },
     "9470.T": {
       "name": "学研ホールディングス",
@@ -11681,7 +11687,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.68
     },
     "8278.T": {
       "name": "フジ",
@@ -11720,7 +11726,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.55
     },
     "1835.T": {
       "name": "東鉄工業",
@@ -11761,7 +11767,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.0
     },
     "9726.T": {
       "name": "KNT-CTホールディングス",
@@ -11800,7 +11806,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 12.41
     },
     "4554.T": {
       "name": "富士製薬工業",
@@ -11841,7 +11847,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.17
     },
     "1934.T": {
       "name": "ユアテック",
@@ -11882,7 +11888,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.46
     },
     "1766.T": {
       "name": "東建コーポレーション",
@@ -11924,7 +11930,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.05
     },
     "7231.T": {
       "name": "トピー工業",
@@ -11963,7 +11969,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.59
     },
     "6328.T": {
       "name": "荏原実業",
@@ -12004,7 +12010,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.62
     },
     "3765.T": {
       "name": "ガンホー・オンライン・エンターテイメント",
@@ -12045,7 +12051,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.36
     },
     "6905.T": {
       "name": "コーセル",
@@ -12086,7 +12092,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.34
     },
     "6238.T": {
       "name": "フリュー",
@@ -12127,7 +12133,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.23
     },
     "3159.T": {
       "name": "丸善CHIホールディングス",
@@ -12168,7 +12174,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 15.25
     },
     "4592.T": {
       "name": "サンバイオ",
@@ -12207,7 +12213,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 623.91
     },
     "6387.T": {
       "name": "サムコ",
@@ -12248,7 +12254,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 24.6
     },
     "8914.T": {
       "name": "エリアリンク",
@@ -12287,7 +12293,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.49
     },
     "8157.T": {
       "name": "都築電気",
@@ -12326,7 +12332,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.76
     },
     "9658.T": {
       "name": "ビジネスブレイン太田昭和",
@@ -12368,7 +12374,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.2
     },
     "8920.T": {
       "name": "東祥",
@@ -12407,7 +12413,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 43.08
     },
     "4587.T": {
       "name": "ペプチドリーム",
@@ -12448,7 +12454,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 17.3
     },
     "9474.T": {
       "name": "ゼンリン",
@@ -12489,7 +12495,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.27
     },
     "8130.T": {
       "name": "サンゲツ",
@@ -12530,7 +12536,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.72
     },
     "6258.T": {
       "name": "平田機工",
@@ -12571,7 +12577,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.77
     },
     "1847.T": {
       "name": "イチケン",
@@ -12613,7 +12619,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 395.5
     },
     "2815.T": {
       "name": "アリアケジャパン",
@@ -12652,7 +12658,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.49
     },
     "8616.T": {
       "name": "東海東京フィナンシャル・ホールディングス",
@@ -12693,7 +12699,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.72
     },
     "3843.T": {
       "name": "フリービット",
@@ -12735,7 +12741,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.01
     },
     "8185.T": {
       "name": "チヨダ",
@@ -12776,7 +12782,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.19
     },
     "9068.T": {
       "name": "丸全昭和運輸",
@@ -12817,7 +12823,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.82
     },
     "2395.T": {
       "name": "新日本科学",
@@ -12858,7 +12864,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.76
     },
     "6395.T": {
       "name": "タダノ",
@@ -12899,7 +12905,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 14.58
     },
     "4595.T": {
       "name": "ミズホメディー",
@@ -12938,7 +12944,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 354.38
     },
     "8881.T": {
       "name": "日神グループホールディングス",
@@ -12979,7 +12985,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.25
     },
     "6289.T": {
       "name": "技研製作所",
@@ -13018,7 +13024,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.83
     },
     "2207.T": {
       "name": "名糖産業",
@@ -13059,7 +13065,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.47
     },
     "8713.T": {
       "name": "フィデアホールディングス",
@@ -13100,7 +13106,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 16.11
     },
     "3193.T": {
       "name": "鳥貴族ホールディングス",
@@ -13141,7 +13147,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.74
     },
     "2217.T": {
       "name": "モロゾフ",
@@ -13182,7 +13188,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.17
     },
     "2221.T": {
       "name": "岩塚製菓",
@@ -13262,7 +13268,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 7.02
     },
     "3196.T": {
       "name": "ホットランド",
@@ -13303,7 +13309,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.47
     },
     "6498.T": {
       "name": "キッツ",
@@ -13342,7 +13348,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 9.52
     },
     "3932.T": {
       "name": "アカツキ",
@@ -13381,7 +13387,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.64
     },
     "1952.T": {
       "name": "新日本空調",
@@ -13420,7 +13426,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.07
     },
     "2209.T": {
       "name": "井村屋グループ",
@@ -13461,7 +13467,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.58
     },
     "8150.T": {
       "name": "三信電気",
@@ -13502,7 +13508,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.4
     },
     "3284.T": {
       "name": "フージャースホールディングス",
@@ -13543,7 +13549,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.65
     },
     "6932.T": {
       "name": "遠藤照明",
@@ -13584,7 +13590,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 61.71
     },
     "9467.T": {
       "name": "アルファポリス",
@@ -13625,7 +13631,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 14.21
     },
     "3854.T": {
       "name": "アイル",
@@ -13666,7 +13672,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 137.83
     },
     "9740.T": {
       "name": "セントラル警備保障",
@@ -13705,7 +13711,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.95
     },
     "8609.T": {
       "name": "岡三証券グループ",
@@ -13746,7 +13752,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.55
     },
     "3222.T": {
       "name": "ユナイテッド・スーパーマーケット・ホールディングス",
@@ -13785,7 +13791,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.73
     },
     "7224.T": {
       "name": "新明和工業",
@@ -13826,7 +13832,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.89
     },
     "1930.T": {
       "name": "北陸電気工事",
@@ -13867,7 +13873,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 61.18
     },
     "9793.T": {
       "name": "ダイセキ",
@@ -13906,7 +13912,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.81
     },
     "6472.T": {
       "name": "NTN",
@@ -13947,7 +13953,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.1
     },
     "4180.T": {
       "name": "Appier Group",
@@ -13988,7 +13994,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 59.97
     },
     "7004.T": {
       "name": "日立造船",
@@ -14027,7 +14033,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.28
     },
     "4480.T": {
       "name": "メドレー",
@@ -14066,7 +14072,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.37
     },
     "6376.T": {
       "name": "日機装",
@@ -14107,7 +14113,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.51
     },
     "1827.T": {
       "name": "ナカノフドー建設",
@@ -14148,7 +14154,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 10.46
     },
     "3679.T": {
       "name": "じげん",
@@ -14189,7 +14195,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.31
     },
     "8614.T": {
       "name": "東洋証券",
@@ -14230,7 +14236,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.85
     },
     "2931.T": {
       "name": "ユーグレナ",
@@ -14271,7 +14277,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.44
     },
     "6490.T": {
       "name": "日本ピラー工業",
@@ -14312,7 +14318,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.49
     },
     "6310.T": {
       "name": "井関農機",
@@ -14353,7 +14359,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 7.72
     },
     "1888.T": {
       "name": "若築建設",
@@ -14394,7 +14400,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.78
     },
     "4443.T": {
       "name": "Sansan",
@@ -14433,7 +14439,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.27
     },
     "6333.T": {
       "name": "帝国電機製作所",
@@ -14474,7 +14480,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.65
     },
     "9687.T": {
       "name": "KSK",
@@ -14515,7 +14521,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.94
     },
     "9115.T": {
       "name": "明治海運",
@@ -14597,7 +14603,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2244.29
     },
     "3825.T": {
       "name": "リミックスポイント",
@@ -14679,7 +14685,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.73
     },
     "6418.T": {
       "name": "日本金銭機械",
@@ -14720,7 +14726,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.27
     },
     "3983.T": {
       "name": "オロ",
@@ -14761,7 +14767,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.87
     },
     "4477.T": {
       "name": "BASE",
@@ -14802,7 +14808,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 35.08
     },
     "6266.T": {
       "name": "タツモ",
@@ -14843,7 +14849,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.94
     },
     "8103.T": {
       "name": "明和産業",
@@ -14884,7 +14890,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.32
     },
     "7245.T": {
       "name": "大同メタル工業",
@@ -14925,7 +14931,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.02
     },
     "6958.T": {
       "name": "日本シイエムケイ",
@@ -14964,7 +14970,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 3.2
     },
     "6315.T": {
       "name": "TOWA",
@@ -15003,7 +15009,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 18.62
     },
     "2923.T": {
       "name": "サトウ食品",
@@ -15085,7 +15091,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.32
     },
     "6941.T": {
       "name": "山一電機",
@@ -15126,7 +15132,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 5.27
     },
     "3183.T": {
       "name": "ウイン・パートナーズ",
@@ -15167,7 +15173,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.02
     },
     "4475.T": {
       "name": "HENNGE",
@@ -15208,7 +15214,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.72
     },
     "6222.T": {
       "name": "島精機製作所",
@@ -15249,7 +15255,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.74
     },
     "9640.T": {
       "name": "セゾンテクノロジー",
@@ -15290,7 +15296,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1041.0
     },
     "8154.T": {
       "name": "加賀電子",
@@ -15329,7 +15335,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.01
     },
     "8151.T": {
       "name": "東陽テクニカ",
@@ -15370,7 +15376,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.48
     },
     "6844.T": {
       "name": "新電元工業",
@@ -15411,7 +15417,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 8.7
     },
     "3844.T": {
       "name": "コムチュア",
@@ -15452,7 +15458,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.01
     },
     "3687.T": {
       "name": "フィックスターズ",
@@ -15493,7 +15499,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 4.63
     },
     "1780.T": {
       "name": "ヤマウラ",
@@ -15534,7 +15540,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 0.07
     },
     "9913.T": {
       "name": "日邦産業",
@@ -15573,7 +15579,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.17
     },
     "1866.T": {
       "name": "北野建設",
@@ -15614,7 +15620,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.87
     },
     "1968.T": {
       "name": "太平電業",
@@ -15655,7 +15661,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.17
     },
     "9438.T": {
       "name": "エムティーアイ",
@@ -15696,7 +15702,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 1.31
     },
     "9880.T": {
       "name": "イノテック",
@@ -15735,7 +15741,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 984.33
     },
     "4449.T": {
       "name": "ギフティ",
@@ -15776,7 +15782,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 16.34
     },
     "4593.T": {
       "name": "ヘリオス",
@@ -15815,7 +15821,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 6.15
     },
     "4259.T": {
       "name": "エクサウィザーズ",
@@ -15854,7 +15860,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 838.54
     },
     "3093.T": {
       "name": "トレジャー・ファクトリー",
@@ -15893,10 +15899,10 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 18.04
     },
     "4499.T": {
-      "name": "(株)Ｓｐｅｅｅ",
+      "name": "Speee",
       "price": 2811.0,
       "volume": 194800,
       "avg_volume": 318187,
@@ -15932,7 +15938,7 @@
       "margin_sell": 0,
       "margin_buy_change": 0,
       "margin_sell_change": 0,
-      "margin_ratio": null
+      "margin_ratio": 2.76
     }
   },
   "disclaimer": "本ツールは市場データの可視化を目的とした補助ツールです。銘柄推奨・売買助言ではありません。"
