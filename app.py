@@ -1209,31 +1209,13 @@ def _evaluate_stock_cached(ticker):
     if is_magma: icons_list.append("🦅")
     icons_str = " ".join(icons_list)
 
-    # ★ 信用需給データをKABU+から取得
-    margin_info = {}
-    try:
-        kp_margin = _load_kabuplus_margin()
-        margin_info = kp_margin.get(ticker, {})
-    except Exception:
-        pass
-
-    margin_buy = margin_info.get("margin_buy", 0)
-    margin_sell = margin_info.get("margin_sell", 0)
-    margin_ratio = margin_info.get("margin_ratio")
-    margin_buy_chg = margin_info.get("margin_buy_change", 0)
-    margin_sell_chg = margin_info.get("margin_sell_change", 0)
-
-    if margin_ratio is not None and margin_ratio > 0:
-        if margin_ratio < 1.0:
-            margin_str = f"📊 売り優勢（貸借倍率: {margin_ratio:.2f}倍）買残{margin_buy:,} / 売残{margin_sell:,}"
-        elif margin_ratio <= 3.0:
-            margin_str = f"📊 拮抗（貸借倍率: {margin_ratio:.2f}倍）買残{margin_buy:,} / 売残{margin_sell:,}"
-        else:
-            margin_str = f"📊 買残過多（貸借倍率: {margin_ratio:.2f}倍）買残{margin_buy:,} / 売残{margin_sell:,}"
-    elif margin_buy > 0 or margin_sell > 0:
-        margin_str = f"📊 買残{margin_buy:,} / 売残{margin_sell:,}"
-    else:
-        margin_str = "📊 データなし"
+    # ★ 信用需給はキャッシュ外で取得するためここでは空値を設定
+    margin_str = None
+    margin_ratio = None
+    margin_buy = 0
+    margin_sell = 0
+    margin_buy_chg = 0
+    margin_sell_chg = 0
 
     return {
         "コード": code_only, "銘柄名": jp_name, "現在値": int(current_price),
@@ -1719,7 +1701,27 @@ def show_main_page():
                                     st.write(f"時価総額: **{diag_data['時価総額_表示']}**")
                                     st.write(f"配当情報: **{diag_data['dividend_text']}**")
                                     st.write(f"商い熱量: **{diag_data['turnover_str']}**")
-                                    st.write(f"信用需給: **{diag_data.get('margin_str', 'データなし')}**")
+                                    # ★ 信用需給はキャッシュ外でリアルタイム取得
+                                    try:
+                                        _kp_margin = _load_kabuplus_margin()
+                                        _mg = _kp_margin.get(ticker, {})
+                                        _mg_ratio = _mg.get("margin_ratio")
+                                        _mg_buy = _mg.get("margin_buy", 0)
+                                        _mg_sell = _mg.get("margin_sell", 0)
+                                        if _mg_ratio is not None and _mg_ratio > 0:
+                                            if _mg_ratio < 1.0:
+                                                _margin_str = f"📊 売り優勢（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                            elif _mg_ratio <= 3.0:
+                                                _margin_str = f"📊 拮抗（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                            else:
+                                                _margin_str = f"📊 買残過多（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                        elif _mg_buy > 0 or _mg_sell > 0:
+                                            _margin_str = f"📊 買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                        else:
+                                            _margin_str = "📊 データなし"
+                                    except Exception:
+                                        _margin_str = "📊 データなし"
+                                    st.write(f"信用需給: **{_margin_str}**")
                                     
                                     with st.expander("💡 信用需給（貸借倍率）の見方", key=f"diag_exp_margin_{code}"):
                                         st.markdown("""
