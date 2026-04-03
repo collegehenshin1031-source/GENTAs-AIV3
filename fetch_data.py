@@ -21,13 +21,12 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-import time
-
 import numpy as np
 import pandas as pd
 import pytz
 import requests
-import yfinance as yf
+# yfinance は KABU+ 四本値データに完全置換済み（yfinance依存撤廃）
+# import yfinance as yf
 
 
 def calculate_volume_profile(df: pd.DataFrame, bins: int = 24) -> pd.DataFrame:
@@ -1478,42 +1477,6 @@ def calculate_reorg_score(market_cap_oku: float | None, pbr: float | None) -> fl
     return float(min(100.0, max(0.0, score)))
 
 
-def calculate_event_score(stock: yf.Ticker, now_jst: datetime) -> tuple[float, list[str]]:
-    """直前兆候（0-100）とタグ。yfinanceで取れる範囲のみ。"""
-    score = 0.0
-    tags: list[str] = []
-
-    # 決算日近接（取れる場合のみ）
-    try:
-        ed = None
-        if hasattr(stock, "earnings_dates"):
-            edf = stock.earnings_dates
-            if edf is not None and len(edf) > 0:
-                ed = edf.index[0].to_pydatetime()
-        if ed:
-            ed_jst = JST.localize(ed) if ed.tzinfo is None else ed.astimezone(JST)
-            if abs((ed_jst.date() - now_jst.date()).days) <= 3:
-                score += 35.0
-                tags.append("決算近")
-    except Exception:
-        pass
-
-    # 権利期（配当など）
-    try:
-        info = stock.info or {}
-        ex = info.get("exDividendDate")
-        if ex:
-            ex_dt = datetime.fromtimestamp(int(ex), tz=JST)
-            delta = (ex_dt.date() - now_jst.date()).days
-            if -2 <= delta <= 5:
-                score += 15.0
-                tags.append("権利期")
-    except Exception:
-        pass
-
-    return float(min(100.0, score)), tags
-
-
 def determine_level(ma_score: float) -> int:
     if ma_score >= 75:
         return 4
@@ -1526,235 +1489,215 @@ def determine_level(ma_score: float) -> int:
     return 0
 
 
-def fetch_volume_data(tickers: list[str], chunk_size: int = 10, kabuplus_info: dict | None = None) -> tuple[dict, dict, dict, list]:
+def fetch_volume_data(
+    tickers: list[str],
+    ohlc_cache: dict | None = None,
+    kabuplus_info: dict | None = None,
+) -> tuple[dict, dict, dict, list]:
+    """
+    KABU+ 四本値キャッシュ（ohlc_cache）を使って全銘柄を処理する。
+    yf.download() は一切使用しない。
+
+    ohlc_cache: {code: DataFrame(index=DatetimeIndex, cols=[Open,High,Low,Close,Volume])}
+                code は "7203" 形式（.T なし）
+    """
     results: dict = {}
     qualified: dict = {}
     stock_history: dict = {}
     shards: list[dict] = [{} for _ in range(HISTORY_SHARD_COUNT)]
     prev_streaks = load_previous_streaks()
     total = len(tickers)
-    now_jst = datetime.now(JST)
+    if ohlc_cache is None:
+        ohlc_cache = {}
     if kabuplus_info is None:
         kabuplus_info = {}
 
-    for i in range(0, total, chunk_size):
-        chunk = tickers[i:i + chunk_size]
-        print(f"📥 データ取得中: {i+1}〜{min(i+chunk_size, total)} / {total}")
+    hit = 0
+    miss = 0
+    LOG_INTERVAL = 200  # 何銘柄ごとに進捗表示するか
+
+    for idx, ticker in enumerate(tickers):
+        if idx % LOG_INTERVAL == 0:
+            print(f"📊 処理中: {idx + 1} / {total}  (取得済み={hit}, スキップ={miss})")
 
         try:
-            data = yf.download(
-                tickers=chunk,
-                period="1y",
-                interval="1d",
-                group_by="ticker",
-                auto_adjust=True,
-                progress=False,
-                threads=True,
-            )
-            if data.empty:
+            # ── OHLC取得 ─────────────────────────────────────────
+            code = ticker.replace(".T", "").strip()
+            df = ohlc_cache.get(code)
+
+            if df is None or df.empty:
+                miss += 1
                 continue
 
-            for ticker in chunk:
+            df = df.dropna(subset=["Close"])
+            if len(df) < 60:
+                miss += 1
+                continue
+
+            hit += 1
+
+            # ── FlowScore ───────────────────────────────────────
+            flow_details = calculate_flow_score(df)
+            flow_score = float(flow_details["flow_score"])
+
+            avg_volume = int(df["Volume"].tail(LOOKBACK_DAYS).mean())
+            latest_volume = int(df["Volume"].iloc[-1])
+            vol_ratio = round(latest_volume / avg_volume, 2) if avg_volume > 0 else 0
+            latest_price = float(df["Close"].iloc[-1])
+            price_change_5d = (
+                round((df["Close"].iloc[-1] / df["Close"].iloc[-6] - 1) * 100, 2)
+                if len(df) >= 6 else 0
+            )
+
+            # ── KABU+ info（時価総額・PBR・株数） ──────────────
+            market_cap_oku = 0.0
+            api_name = None
+            pbr = None
+            shares_outstanding = None
+            shares_outstanding_is_estimated = False
+            info: dict = {}
+
+            kp_info = kabuplus_info.get(ticker, {})
+            if kp_info:
+                info = kp_info
+                mc = kp_info.get("marketCap", 0) or 0
+                if mc:
+                    market_cap_oku = round(float(mc) / 1e8, 0)
+                api_name = kp_info.get("shortName") or kp_info.get("longName")
+                pbr = kp_info.get("priceToBook")
+                so = kp_info.get("sharesOutstanding")
+                if so is not None and so > 0:
+                    shares_outstanding = int(so)
+                else:
+                    if mc and latest_price:
+                        try:
+                            shares_outstanding = int(float(mc) / float(latest_price))
+                            shares_outstanding_is_estimated = True
+                        except Exception:
+                            shares_outstanding = None
+            # KABU+ にない場合はスキップ（yfinance 依存撤廃）
+
+            # ── 株式履歴保存 ────────────────────────────────────
+            stock_history[ticker] = {
+                "dates": [d.strftime("%Y-%m-%d") for d in df.index],
+                "O": [round(float(v), 1) for v in df["Open"]],
+                "H": [round(float(v), 1) for v in df["High"]],
+                "L": [round(float(v), 1) for v in df["Low"]],
+                "C": [round(float(v), 1) for v in df["Close"]],
+                "V": [int(v) for v in df["Volume"]],
+                "info": {
+                    "marketCap": info.get("marketCap"),
+                    "sharesOutstanding": info.get("sharesOutstanding"),
+                    "dividendRate": info.get("dividendRate"),
+                    "trailingAnnualDividendRate": info.get("trailingAnnualDividendRate"),
+                    "payoutRatio": info.get("payoutRatio"),
+                    "dividendYield": info.get("dividendYield"),
+                    "trailingAnnualDividendYield": info.get("trailingAnnualDividendYield"),
+                    "shortName": info.get("shortName"),
+                    "longName": info.get("longName"),
+                },
+            }
+            shards[hash_ticker_shard_id(ticker)][ticker] = stock_history[ticker]
+
+            name = get_japanese_name(ticker, api_name)
+            in_range = MARKET_CAP_MIN <= market_cap_oku <= MARKET_CAP_MAX
+
+            # ── 要監視・連続日数 ────────────────────────────────
+            watch_flag = is_watch_state(flow_details)
+            display_state = "要監視" if watch_flag else "観測中"
+            prev_high = int(prev_streaks.get(ticker, 0))
+            flow_streak_high = prev_high + 1 if flow_score >= FLOW_SCORE_HIGH else 0
+
+            # ── スコア計算 ──────────────────────────────────────
+            reorg_score = calculate_reorg_score(market_cap_oku, pbr)
+            event_score: float = 0.0
+            event_tags: list[str] = []
+
+            ma_score = float(
+                min(100.0, max(0.0,
+                    flow_score * 0.45 + reorg_score * 0.40 + event_score * 0.15
+                ))
+            )
+            level = determine_level(ma_score)
+
+            # ── サポートライン ──────────────────────────────────
+            support_price = None
+            support_upper = None
+            support_gap_pct = None
+            support_tag = None
+            try:
+                df_half_year = df.tail(125)
+                if len(df_half_year) >= 30:
+                    vp = calculate_volume_profile(df_half_year, bins=24)
+                    sup_p, sup_u = compute_support_zone_from_profile(vp)
+                    if sup_p is not None:
+                        support_price = sup_p
+                        support_upper = sup_u
+                        support_tag, support_gap_pct = support_position_tag(
+                            latest_price, support_price
+                        )
+            except Exception:
+                pass
+
+            # ── タグ ────────────────────────────────────────────
+            tags: list[str] = []
+            if support_tag:
+                tags.append(support_tag)
+            if watch_flag:
+                tags.append("要監視")
+            if flow_details.get("vol_anomaly", 0) >= 50:
+                tags.append("出来高変化")
+            if flow_streak_high >= 2:
+                tags.append(f"継続{flow_streak_high}日")
+            tags.extend(event_tags)
+
+            # ── 発行株数に対する出来高比率 ───────────────────────
+            volume_of_shares_pct = None
+            volume_of_shares_pct_is_estimated = False
+            if shares_outstanding and shares_outstanding > 0:
                 try:
-                    if len(chunk) == 1:
-                        df = data[["Open", "High", "Low", "Close", "Volume"]].copy()
-                    else:
-                        if ticker not in data.columns.get_level_values(0):
-                            continue
-                        df = data[ticker][["Open", "High", "Low", "Close", "Volume"]].copy()
-
-                    df = df.dropna()
-                    if len(df) < 60:
-                        continue
-
-                    flow_details = calculate_flow_score(df)
-                    flow_score = float(flow_details["flow_score"])
-
-                    avg_volume = int(df["Volume"].tail(LOOKBACK_DAYS).mean())
-                    latest_volume = int(df["Volume"].iloc[-1])
-                    vol_ratio = round(latest_volume / avg_volume, 2) if avg_volume > 0 else 0
-                    latest_price = float(df["Close"].iloc[-1])
-
-                   
-
-                    price_change_5d = round((df["Close"].iloc[-1] / df["Close"].iloc[-6] - 1) * 100, 2) if len(df) >= 6 else 0
-
-                    market_cap_oku = 0.0
-                    api_name = None
-                    pbr = None
-                    shares_outstanding = None
-                    shares_outstanding_is_estimated = False
-                    stock = None
-                    info = {}
-
-                    # ★ KABU+ から一括取得済みのデータを使用（yf.Ticker().info を排除）
-                    kp_info = kabuplus_info.get(ticker, {})
-                    if kp_info:
-                        info = kp_info
-                        mc = kp_info.get("marketCap", 0) or 0
-                        if mc:
-                            market_cap_oku = round(float(mc) / 1e8, 0)
-                        api_name = kp_info.get("shortName") or kp_info.get("longName")
-                        pbr = kp_info.get("priceToBook")
-                        so = kp_info.get("sharesOutstanding")
-                        if so is not None and so > 0:
-                            shares_outstanding = int(so)
-                        else:
-                            if mc and latest_price:
-                                try:
-                                    shares_outstanding = int(float(mc) / float(latest_price))
-                                    shares_outstanding_is_estimated = True
-                                except Exception:
-                                    shares_outstanding = None
-                    else:
-                        # KABU+ にない場合のみ yfinance にフォールバック
-                        try:
-                            stock = yf.Ticker(ticker)
-                            info = stock.info or {}
-                            mc = info.get("marketCap", 0) or 0
-                            if mc:
-                                market_cap_oku = round(float(mc) / 1e8, 0)
-                            api_name = info.get("shortName") or info.get("longName")
-                            pbr = info.get("priceToBook")
-                            so = info.get("sharesOutstanding")
-                            if so is not None:
-                                shares_outstanding = int(so)
-                            else:
-                                mc_val = info.get("marketCap") or 0
-                                px_val = info.get("currentPrice") or latest_price
-                                if mc_val and px_val:
-                                    try:
-                                        shares_outstanding = int(float(mc_val) / float(px_val))
-                                        shares_outstanding_is_estimated = True
-                                    except Exception:
-                                        shares_outstanding = None
-                        except Exception:
-                            pass
-
-                    stock_history[ticker] = {
-                        "dates": [d.strftime("%Y-%m-%d") for d in df.index],
-                        "O": [round(float(v), 1) for v in df["Open"]],
-                        "H": [round(float(v), 1) for v in df["High"]],
-                        "L": [round(float(v), 1) for v in df["Low"]],
-                        "C": [round(float(v), 1) for v in df["Close"]],
-                        "V": [int(v) for v in df["Volume"]],
-                        "info": {
-                            "marketCap": info.get("marketCap"),
-                            "sharesOutstanding": info.get("sharesOutstanding"),
-                            "dividendRate": info.get("dividendRate"),
-                            "trailingAnnualDividendRate": info.get("trailingAnnualDividendRate"),
-                            "payoutRatio": info.get("payoutRatio"),
-                            "dividendYield": info.get("dividendYield"),
-                            "trailingAnnualDividendYield": info.get("trailingAnnualDividendYield"),
-                            "shortName": info.get("shortName"),
-                            "longName": info.get("longName"),
-                        },
-                    }
-                    shards[hash_ticker_shard_id(ticker)][ticker] = stock_history[ticker]
-
-                    name = get_japanese_name(ticker, api_name)
-                    in_range = (MARKET_CAP_MIN <= market_cap_oku <= MARKET_CAP_MAX)
-
-                    # 要監視（表示用）
-                    watch_flag = is_watch_state(flow_details)
-                    display_state = "要監視" if watch_flag else "観測中"
-
-                    # 連続（Flow70+）
-                    prev_high = int(prev_streaks.get(ticker, 0))
-                    flow_streak_high = prev_high + 1 if flow_score >= FLOW_SCORE_HIGH else 0
-
-                    # 追加スコア
-                    reorg_score = calculate_reorg_score(market_cap_oku, pbr)
-                    # ★ event_score は KABU+ にデータがないため簡略化
-                    # （yf.Ticker().earnings_dates は非常に遅いため除外）
-                    event_score, event_tags = (0.0, [])
-
-                    ma_score = float(min(100.0, max(0.0, flow_score * 0.45 + reorg_score * 0.40 + event_score * 0.15)))
-                    level = determine_level(ma_score)
-
-                    # --- ここから追加・修正（サポートラインの計算） ---
-                    support_price = None
-                    support_upper = None
-                    support_gap_pct = None
-                    support_tag = None
-
-                    try:
-                        df_half_year = df.tail(125)
-                        if len(df_half_year) >= 30:
-                            vp = calculate_volume_profile(df_half_year, bins=24)
-                            sup_p, sup_u = compute_support_zone_from_profile(vp)
-                            if sup_p is not None:
-                                support_price = sup_p
-                                support_upper = sup_u
-                                support_tag, support_gap_pct = support_position_tag(latest_price, support_price)
-                    except Exception:
-                        pass
-                    # --- ここまで ---
-
-                    tags = []
-                    # 下値ライン位置タグ（中立表現）
-                    if support_tag:
-                        tags.append(support_tag)
-                    if watch_flag:
-                        tags.append("要監視")
-                    if flow_details.get("vol_anomaly", 0) >= 50:
-                        tags.append("出来高変化")
-                    if flow_streak_high >= 2:
-                        tags.append(f"継続{flow_streak_high}日")
-                    tags.extend(event_tags)
-
-                    # 出来高が総発行株数に対して何%か（目安表示用）
+                    volume_of_shares_pct = (float(latest_volume) / float(shares_outstanding)) * 100.0
+                    volume_of_shares_pct_is_estimated = bool(shares_outstanding_is_estimated)
+                except Exception:
                     volume_of_shares_pct = None
-                    volume_of_shares_pct_is_estimated = False
-                    if shares_outstanding and shares_outstanding > 0:
-                        try:
-                            volume_of_shares_pct = (float(latest_volume) / float(shares_outstanding)) * 100.0
-                            volume_of_shares_pct_is_estimated = bool(shares_outstanding_is_estimated)
-                        except Exception:
-                            volume_of_shares_pct = None
 
-                    result = {
-                        "name": name,
-                        "price": round(latest_price, 1),
-                        "volume": latest_volume,
-                        "avg_volume": avg_volume,
-                        "vol_ratio": vol_ratio,
-                        "shares_outstanding": int(shares_outstanding) if shares_outstanding else None,
-                        "shares_outstanding_is_estimated": bool(shares_outstanding_is_estimated) if shares_outstanding else None,
-                        "volume_of_shares_pct": round(float(volume_of_shares_pct), 3) if volume_of_shares_pct is not None else None,
-                        "volume_of_shares_pct_is_estimated": bool(volume_of_shares_pct_is_estimated) if volume_of_shares_pct is not None else None,
-                        "price_change_5d": price_change_5d,
-                        "market_cap_oku": int(market_cap_oku) if market_cap_oku else 0,
-                        "pbr": round(float(pbr), 2) if pbr else None,
-                        "in_cap_range": in_range,
-                        "level": int(level),
-                        "ma_score": round(ma_score, 1),
-                        "flow_score": round(flow_score, 1),
-                        "flow_details": flow_details,
-                        "flow_streak_high": int(flow_streak_high),
-                        "reorg_score": round(reorg_score, 1),
-                        "event_score": round(event_score, 1),
-                        "display_state": display_state,
-                        "support_price": round(float(support_price), 1) if support_price else None,
-                        "support_upper": round(float(support_upper), 1) if support_upper else None,
-                        "support_gap_pct": round(float(support_gap_pct), 1) if support_gap_pct is not None else None,
-                        "tags": tags,
-                    }
+            result = {
+                "name": name,
+                "price": round(latest_price, 1),
+                "volume": latest_volume,
+                "avg_volume": avg_volume,
+                "vol_ratio": vol_ratio,
+                "shares_outstanding": int(shares_outstanding) if shares_outstanding else None,
+                "shares_outstanding_is_estimated": bool(shares_outstanding_is_estimated) if shares_outstanding else None,
+                "volume_of_shares_pct": round(float(volume_of_shares_pct), 3) if volume_of_shares_pct is not None else None,
+                "volume_of_shares_pct_is_estimated": bool(volume_of_shares_pct_is_estimated) if volume_of_shares_pct is not None else None,
+                "price_change_5d": price_change_5d,
+                "market_cap_oku": int(market_cap_oku) if market_cap_oku else 0,
+                "pbr": round(float(pbr), 2) if pbr else None,
+                "in_cap_range": in_range,
+                "level": int(level),
+                "ma_score": round(ma_score, 1),
+                "flow_score": round(flow_score, 1),
+                "flow_details": flow_details,
+                "flow_streak_high": int(flow_streak_high),
+                "reorg_score": round(reorg_score, 1),
+                "event_score": round(event_score, 1),
+                "display_state": display_state,
+                "support_price": round(float(support_price), 1) if support_price else None,
+                "support_upper": round(float(support_upper), 1) if support_upper else None,
+                "support_gap_pct": round(float(support_gap_pct), 1) if support_gap_pct is not None else None,
+                "tags": tags,
+            }
 
-                    results[ticker] = result
-
-                    if in_range and flow_score >= FLOW_SCORE_MEDIUM:
-                        qualified[ticker] = result
-
-                except Exception as e:
-                    print(f"  ❌ {ticker}: {str(e)[:80]}")
-                    continue
+            results[ticker] = result
+            if in_range and flow_score >= FLOW_SCORE_MEDIUM:
+                qualified[ticker] = result
 
         except Exception as e:
-            print(f"  ❌ チャンク取得エラー: {e}")
+            print(f"  ❌ {ticker}: {str(e)[:80]}")
+            continue
 
-        time.sleep(3)
-
+    print(f"✅ 全銘柄処理完了: 成功={hit}, スキップ={miss} / 合計={total}")
     return results, qualified, stock_history, shards
 
 
@@ -1777,6 +1720,7 @@ def main():
     # ★ KABU+ から全銘柄の指標データを一括取得（1-2秒）
     kabuplus_info = {}
     margin_lookup = {}
+    ohlc_cache: dict = {}
     try:
         import kabuplus_client as kp
         kp_id, kp_pw = kp.get_credentials()
@@ -1787,7 +1731,7 @@ def main():
                 kabuplus_info = kp.build_info_lookup(merged)
                 print(f"  → KABU+ {len(kabuplus_info)}銘柄の指標データ取得完了")
             else:
-                print("  ⚠️ KABU+ データ取得失敗（休日の可能性）→ yfinance フォールバック")
+                print("  ⚠️ KABU+ 指標データ取得失敗（休日の可能性）")
 
             # ★ 信用残高データ（週次）
             print("📡 KABU+ 信用残高データ取得中...")
@@ -1797,12 +1741,22 @@ def main():
                 print(f"  → 信用残高 {len(margin_lookup)}銘柄取得完了")
             else:
                 print("  ⚠️ 信用残高データ取得失敗")
-        else:
-            print("  ⚠️ KABU+ 認証情報なし → yfinance フォールバック")
-    except Exception as e:
-        print(f"  ⚠️ KABU+ エラー: {e} → yfinance フォールバック")
 
-    results, qualified, stock_history, shards = fetch_volume_data(universe, kabuplus_info=kabuplus_info)
+            # ★ 四本値OHLC履歴（yfinance 完全置換）
+            print("📡 KABU+ 四本値履歴データ並列取得中（最大250営業日）...")
+            ohlc_cache = kp.fetch_ohlc_history(kp_id, kp_pw, lookback_days=250)
+            if not ohlc_cache:
+                print("  ⚠️ OHLC履歴データ取得失敗（全銘柄スキップの可能性）")
+        else:
+            print("  ⚠️ KABU+ 認証情報なし → OHLCデータなし（処理対象ゼロになります）")
+    except Exception as e:
+        print(f"  ⚠️ KABU+ エラー: {e}")
+
+    results, qualified, stock_history, shards = fetch_volume_data(
+        universe,
+        ohlc_cache=ohlc_cache,
+        kabuplus_info=kabuplus_info,
+    )
 
     # ★ 信用残高データを各銘柄の結果に統合
     for ticker, result in results.items():
