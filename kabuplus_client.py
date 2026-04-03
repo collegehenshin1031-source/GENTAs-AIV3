@@ -349,11 +349,11 @@ def build_margin_lookup(margin_df):
             continue
         ticker = f"{code}.T"
         lookup[ticker] = {
-            "margin_buy":         int(row.get("margin_buy", 0) or 0),
-            "margin_sell":        int(row.get("margin_sell", 0) or 0),
-            "margin_buy_change":  int(row.get("margin_buy_change", 0) or 0),
-            "margin_sell_change": int(row.get("margin_sell_change", 0) or 0),
-            "margin_ratio":       round(float(row.get("margin_ratio") or 0), 2)
-                                  if row.get("margin_ratio") else None,
+            "margin_buy":         int(_safe_float(row.get("margin_buy"))),
+            "margin_sell":        int(_safe_float(row.get("margin_sell"))),
+            "margin_buy_change":  int(_safe_float(row.get("margin_buy_change"))),
+            "margin_sell_change": int(_safe_float(row.get("margin_sell_change"))),
+            "margin_ratio":       round(_safe_float(row.get("margin_ratio")), 2)
+                                  if _safe_float(row.get("margin_ratio")) else None,
         }
     return lookup
