@@ -1514,7 +1514,10 @@ def fetch_volume_data(
 
     hit = 0
     miss = 0
-    LOG_INTERVAL = 200  # 何銘柄ごとに進捗表示するか
+    miss_no_ohlc   = 0   # ohlc_cache に存在しない
+    miss_short     = 0   # データが60日未満
+    skip_no_range  = 0   # 時価総額範囲外（market_cap_oku=0 含む）
+    LOG_INTERVAL = 200
 
     for idx, ticker in enumerate(tickers):
         if idx % LOG_INTERVAL == 0:
@@ -1527,11 +1530,13 @@ def fetch_volume_data(
 
             if df is None or df.empty:
                 miss += 1
+                miss_no_ohlc += 1
                 continue
 
             df = df.dropna(subset=["Close"])
             if len(df) < 60:
                 miss += 1
+                miss_short += 1
                 continue
 
             hit += 1
@@ -1690,6 +1695,8 @@ def fetch_volume_data(
             }
 
             results[ticker] = result
+            if not in_range:
+                skip_no_range += 1
             if in_range and flow_score >= FLOW_SCORE_MEDIUM:
                 qualified[ticker] = result
 
@@ -1698,6 +1705,9 @@ def fetch_volume_data(
             continue
 
     print(f"✅ 全銘柄処理完了: 成功={hit}, スキップ={miss} / 合計={total}")
+    print(f"   └ OHLCなし={miss_no_ohlc}, データ不足(<60日)={miss_short}")
+    print(f"   └ 成功{hit}件中: 時価総額範囲外={skip_no_range}, 範囲内={hit - skip_no_range}")
+    print(f"   └ 候補(範囲内+Flow>={FLOW_SCORE_MEDIUM})={len(qualified)}")
     return results, qualified, stock_history, shards
 
 
@@ -1751,6 +1761,31 @@ def main():
             print("  ⚠️ KABU+ 認証情報なし → OHLCデータなし（処理対象ゼロになります）")
     except Exception as e:
         print(f"  ⚠️ KABU+ エラー: {e}")
+
+    # ══ 診断ログ ══════════════════════════════════════════
+    print("\n" + "─" * 60)
+    print("🔍 診断情報")
+    print(f"  ohlc_cache   : {len(ohlc_cache)} 銘柄")
+    print(f"  kabuplus_info: {len(kabuplus_info)} 銘柄")
+    if ohlc_cache:
+        sample_code = next(iter(ohlc_cache))
+        sample_df   = ohlc_cache[sample_code]
+        print(f"  OHLCサンプル : {sample_code} → {len(sample_df)} 日分 "
+              f"({sample_df.index[0].date()} 〜 {sample_df.index[-1].date()})")
+    if kabuplus_info:
+        sample_tk = next(iter(kabuplus_info))
+        sample_info = kabuplus_info[sample_tk]
+        mcap = sample_info.get("marketCap", 0) or 0
+        print(f"  KPサンプル   : {sample_tk} 時価総額={mcap/1e8:.0f}億円 "
+              f"PBR={sample_info.get('priceToBook')}")
+    # universe と ohlc_cache のコード形式確認
+    if universe:
+        u0 = universe[0]
+        code0 = u0.replace(".T", "").strip()
+        in_cache = code0 in ohlc_cache
+        print(f"  universe[0]  : {u0} → code={code0} → cache内={'✅' if in_cache else '❌'}")
+    print("─" * 60 + "\n")
+    # ══════════════════════════════════════════════════════
 
     results, qualified, stock_history, shards = fetch_volume_data(
         universe,
