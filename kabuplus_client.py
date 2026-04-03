@@ -1,17 +1,18 @@
 """
-KABU+ データ取得クライアント（v3 japan-all-stock-prices-2 OHLC版）
-─────────────────────────────────────────────────────────────────
-・全銘柄の株価・指標を1回のHTTPで一括取得
-・OHLC履歴は japan-all-stock-prices-2（実績あり）を250日分並列取得
-  → tosho-stock-ohlc（プランに含まれない可能性）は使用しない
-・yfinance 依存を完全撤廃するためのメインデータソース
-・Basic認証 / Shift-JIS 自動処理
-・Streamlit環境（app.py）でもCLI環境（fetch_data.py）でも動作
+KABU+ データ取得クライアント（v5 gzip圧縮・Session最適化版）
+─────────────────────────────────────────────────────────────
+参考: https://kabu.plus/doc/sample-program/download
+・Accept-Encoding: gzip でCSVを圧縮転送（約1/5〜1/7サイズ）
+・requests.Session でTCPコネクション再利用（高速化）
+・日付なしURL（最新ファイル）と日付ありURL（履歴）を使い分け
+・並列数3 + リクエスト間隔でレート制限を回避
+・yfinance 依存を完全撤廃
 """
 
 from __future__ import annotations
 import io
 import os
+import time
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional, Tuple
@@ -24,21 +25,20 @@ from requests.auth import HTTPBasicAuth
 # ==========================================
 # URL テンプレート
 # ==========================================
-PRICES_URL = (
-    "https://csvex.com/kabu.plus/csv/"
-    "japan-all-stock-prices-2/daily/"
-    "japan-all-stock-prices-2_{date}.csv"
-)
-INDICATORS_URL = (
-    "https://csvex.com/kabu.plus/csv/"
-    "japan-all-stock-data/daily/"
-    "japan-all-stock-data_{date}.csv"
-)
-MARGIN_URL = (
-    "https://csvex.com/kabu.plus/csv/"
-    "japan-all-stock-margin-transactions/weekly/"
-    "japan-all-stock-margin-transactions_{date}.csv"
-)
+# 日付なし（最新ファイル）
+PRICES_URL_LATEST    = "https://csvex.com/kabu.plus/csv/japan-all-stock-prices-2/daily/japan-all-stock-prices-2.csv"
+INDICATORS_URL_LATEST = "https://csvex.com/kabu.plus/csv/japan-all-stock-data/daily/japan-all-stock-data.csv"
+MARGIN_URL_LATEST    = "https://csvex.com/kabu.plus/csv/japan-all-stock-margin-transactions/weekly/japan-all-stock-margin-transactions.csv"
+OHLC_URL_LATEST      = "https://csvex.com/kabu.plus/csv/tosho-stock-ohlc/daily/tosho-stock-ohlc.csv"
+
+# 日付あり（履歴）
+PRICES_URL    = "https://csvex.com/kabu.plus/csv/japan-all-stock-prices-2/daily/japan-all-stock-prices-2_{date}.csv"
+INDICATORS_URL = "https://csvex.com/kabu.plus/csv/japan-all-stock-data/daily/japan-all-stock-data_{date}.csv"
+MARGIN_URL    = "https://csvex.com/kabu.plus/csv/japan-all-stock-margin-transactions/weekly/japan-all-stock-margin-transactions_{date}.csv"
+OHLC_URL      = "https://csvex.com/kabu.plus/csv/tosho-stock-ohlc/daily/tosho-stock-ohlc_{date}.csv"
+
+# gzip圧縮リクエストヘッダー（--compressed 相当）
+_GZIP_HEADERS = {"Accept-Encoding": "gzip, deflate"}
 
 # ==========================================
 # カラム名の正規化マッピング
@@ -63,14 +63,23 @@ INDICATOR_COLUMNS = {
     "最低購入金額": "min_purchase", "単元株数": "unit_shares",
     "発行済株式数": "shares_outstanding",
 }
+# tosho-stock-ohlc の実際の列（2025年7月実測）
+# SC, 日付, 始値, 高値, 安値, 終値, VWAP, 出来高, 売買代金, 前場..., 後場...
+OHLC_COLUMNS = {
+    "SC":     "code",
+    "日付":   "date_str",
+    "始値":   "open",
+    "高値":   "high",
+    "安値":   "low",
+    "終値":   "close",
+    "VWAP":   "vwap",
+    "出来高": "volume",
+    "売買代金": "trading_value",
+}
 MARGIN_COLUMNS = {
-    "SC": "code",
-    "名称": "name",
-    "市場": "market",
-    "信用買残": "margin_buy",
-    "信用買残前週比": "margin_buy_change",
-    "信用売残": "margin_sell",
-    "信用売残前週比": "margin_sell_change",
+    "SC": "code", "名称": "name", "市場": "market",
+    "信用買残": "margin_buy", "信用買残前週比": "margin_buy_change",
+    "信用売残": "margin_sell", "信用売残前週比": "margin_sell_change",
     "貸借倍率": "margin_ratio",
 }
 
@@ -79,7 +88,6 @@ MARGIN_COLUMNS = {
 # 認証情報の取得
 # ==========================================
 def get_credentials() -> Tuple[Optional[str], Optional[str]]:
-    """環境変数 → Streamlit Secrets の順で認証情報を取得"""
     uid = os.environ.get("KABUPLUS_ID")
     pwd = os.environ.get("KABUPLUS_PASSWORD")
     if uid and pwd:
@@ -94,27 +102,41 @@ def get_credentials() -> Tuple[Optional[str], Optional[str]]:
 
 
 # ==========================================
-# CSV 取得（共通）
+# Session 生成（gzip + コネクション再利用）
 # ==========================================
-def _fetch_csv(
-    url_template: str,
-    user_id: str,
-    password: str,
+def _make_session(user_id: str, password: str) -> requests.Session:
+    """gzip圧縮 + Basic認証付き Session を生成"""
+    session = requests.Session()
+    session.auth = HTTPBasicAuth(user_id, password)
+    session.headers.update(_GZIP_HEADERS)
+    return session
+
+
+# ==========================================
+# CSV 取得（共通・最新URLを優先）
+# ==========================================
+def _fetch_csv_latest(
+    url_latest: str,
+    url_dated_template: str,
+    session: requests.Session,
     col_map: dict,
     max_days_back: int = 7,
+    min_rows: int = 100,
 ) -> pd.DataFrame:
-    auth = HTTPBasicAuth(user_id, password)
-    for days_back in range(max_days_back):
-        target = datetime.now() - timedelta(days=days_back)
-        date_str = target.strftime("%Y%m%d")
-        url = url_template.format(date=date_str)
+    """最新URL → 日付URLの順でフォールバックしながらCSV取得"""
+    urls_to_try = [url_latest]
+    for days_back in range(1, max_days_back + 1):
+        d = datetime.now() - timedelta(days=days_back)
+        urls_to_try.append(url_dated_template.format(date=d.strftime("%Y%m%d")))
+
+    for url in urls_to_try:
         try:
-            resp = requests.get(url, auth=auth, timeout=60)
+            resp = session.get(url, timeout=60)
             if resp.status_code != 200:
                 continue
             text = resp.content.decode("shift-jis", errors="replace")
             df = pd.read_csv(io.StringIO(text))
-            if len(df) < 100:
+            if len(df) < min_rows:
                 continue
             rename = {k: v for k, v in col_map.items() if k in df.columns}
             df = df.rename(columns=rename)
@@ -147,136 +169,134 @@ def _clean_numeric(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def _clean_ohlcv_numeric(df: pd.DataFrame) -> pd.DataFrame:
-    """OHLCV用数値クリーニング（マイナス記号も 0 に変換）"""
-    for col in ("open", "high", "low", "close", "volume", "price",
-                "prev_close", "trading_value_k"):
-        if col in df.columns:
-            df[col] = (
-                df[col].astype(str)
-                .str.replace(",", "", regex=False)
-                .str.replace("－", "0", regex=False)
-                .str.replace("−", "0", regex=False)
-                .str.strip()
-            )
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-    return df
-
-
 # ==========================================
-# OHLC履歴取得（japan-all-stock-prices-2 を使用）
+# OHLC 1日分取得
 # ==========================================
-def _fetch_prices_one_day(
+def _fetch_ohlc_one_day(
     target_date: date_t,
-    auth: HTTPBasicAuth,
-    timeout: int = 30,
+    session: requests.Session,
+    timeout: int = 45,
+    max_retries: int = 2,
 ) -> Optional[pd.DataFrame]:
-    """
-    japan-all-stock-prices-2 の1日分を取得して正規化 DataFrame を返す。
-    始値・高値・安値・株価（終値相当）・出来高 を含む。
-    """
+    """tosho-stock-ohlc の1日分を gzip 圧縮付きで取得"""
     date_str = target_date.strftime("%Y%m%d")
-    url = PRICES_URL.format(date=date_str)
-    try:
-        resp = requests.get(url, auth=auth, timeout=timeout)
-        if resp.status_code != 200:
-            return None
-        text = resp.content.decode("shift-jis", errors="replace")
-        df = pd.read_csv(io.StringIO(text))
-        if len(df) < 10:
-            return None
+    url = OHLC_URL.format(date=date_str)
 
-        # カラム名を正規化
-        rename = {k: v for k, v in PRICE_COLUMNS.items() if k in df.columns}
-        df = df.rename(columns=rename)
+    for attempt in range(max_retries):
+        try:
+            resp = session.get(url, timeout=timeout)
+            if resp.status_code == 404:
+                return None   # 休日・未公開
+            if resp.status_code != 200:
+                if attempt < max_retries - 1:
+                    time.sleep(2)
+                continue
 
-        if "code" not in df.columns:
-            return None
+            text = resp.content.decode("shift-jis", errors="replace")
+            df = pd.read_csv(io.StringIO(text))
+            if len(df) < 10:
+                return None
 
-        # 銘柄コード正規化
-        df["code"] = (
-            df["code"].astype(str)
-            .str.strip()
-            .str.replace(r"\.0$", "", regex=True)
-        )
+            rename = {k: v for k, v in OHLC_COLUMNS.items() if k in df.columns}
+            df = df.rename(columns=rename)
 
-        # 数値変換
-        df = _clean_ohlcv_numeric(df)
+            if "code" not in df.columns or "close" not in df.columns:
+                return None
 
-        # close = 株価（当日終値相当）
-        if "close" not in df.columns and "price" in df.columns:
-            df["close"] = df["price"]
+            df["code"] = (
+                df["code"].astype(str)
+                .str.strip()
+                .str.replace(r"\.0$", "", regex=True)
+            )
+            for col in ("open", "high", "low", "close", "volume"):
+                if col in df.columns:
+                    df[col] = pd.to_numeric(
+                        df[col].astype(str).str.replace(",", "", regex=False).str.strip(),
+                        errors="coerce",
+                    )
 
-        # close が全 NaN → 休業日
-        if "close" not in df.columns or df["close"].isna().all():
-            return None
+            if df["close"].isna().all():
+                return None
 
-        # 日付を付与
-        df["_date"] = target_date
-        return df
+            df["_date"] = target_date
+            return df
 
-    except Exception:
-        return None
+        except Exception:
+            if attempt < max_retries - 1:
+                time.sleep(2)
+            continue
+
+    return None
 
 
+# ==========================================
+# OHLC 履歴取得（gzip + Session + 並列数制限）
+# ==========================================
 def fetch_ohlc_history(
     user_id: str,
     password: str,
     lookback_days: int = 250,
-    max_workers: int = 12,
+    max_workers: int = 3,
+    request_interval: float = 0.3,
     calendar_window: int = 390,
 ) -> dict[str, pd.DataFrame]:
     """
-    過去 lookback_days 営業日分の OHLCV を japan-all-stock-prices-2 から並列取得し、
-    {code: DataFrame(index=DatetimeIndex, columns=[Open,High,Low,Close,Volume])} を返す。
-    code は文字列 "7203" 形式（.T なし）。
+    過去 lookback_days 営業日分の OHLCV を tosho-stock-ohlc から取得。
+    gzip 圧縮 + Session でネットワーク負荷を大幅削減。
+    {code: DataFrame(index=DatetimeIndex, cols=[Open,High,Low,Close,Volume])} を返す。
     """
-    auth = HTTPBasicAuth(user_id, password)
+    session = _make_session(user_id, password)
     today = datetime.now().date()
-
     candidate_dates: list[date_t] = [
         today - timedelta(days=i) for i in range(calendar_window)
     ]
 
     frames_by_date: dict[date_t, pd.DataFrame] = {}
     lock = threading.Lock()
+    request_lock = threading.Lock()
+    last_request_time = [0.0]
 
     def _worker(d: date_t):
-        result = _fetch_prices_one_day(d, auth)
+        with request_lock:
+            elapsed = time.time() - last_request_time[0]
+            wait = request_interval - elapsed
+            if wait > 0:
+                time.sleep(wait)
+            last_request_time[0] = time.time()
+
+        result = _fetch_ohlc_one_day(d, session)
         if result is not None:
             with lock:
                 frames_by_date[d] = result
 
-    print(f"  📡 OHLC並列取得開始（最大{calendar_window}日候補 / 目標{lookback_days}営業日 / {max_workers}スレッド）")
+    print(
+        f"  📡 OHLC取得開始（gzip圧縮有効 / 並列{max_workers} / 間隔{request_interval}s）"
+    )
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futs = [executor.submit(_worker, d) for d in candidate_dates]
+        futs = {executor.submit(_worker, d): d for d in candidate_dates}
+        done = 0
         for f in as_completed(futs):
-            pass
+            done += 1
+            if done % 50 == 0:
+                with lock:
+                    got = len(frames_by_date)
+                print(f"    進捗: {done}/{len(candidate_dates)} 試行, {got} 営業日取得済み")
 
     if not frames_by_date:
         print("  ⚠️ OHLC CSVを1件も取得できませんでした")
         return {}
 
-    # 最新 lookback_days 営業日分に絞る
     sorted_dates = sorted(frames_by_date.keys(), reverse=True)[:lookback_days]
-    sorted_dates.sort()  # 昇順
+    sorted_dates.sort()
+    print(f"  ✅ OHLC取得完了: {len(sorted_dates)} 営業日 / {len(frames_by_date)} 取得成功")
 
-    print(f"  ✅ OHLC取得完了: {len(sorted_dates)} 営業日分")
-
-    # 全日付を結合
-    all_frames = [frames_by_date[d] for d in sorted_dates]
-    combined = pd.concat(all_frames, ignore_index=True)
-
-    if "close" not in combined.columns:
-        print(f"  ⚠️ OHLCカラム不足: {combined.columns.tolist()[:15]}")
-        return {}
-
+    combined = pd.concat(
+        [frames_by_date[d] for d in sorted_dates], ignore_index=True
+    )
     combined = combined.dropna(subset=["close"])
 
-    # 銘柄ごとに DataFrame 構築
     ohlc_cache: dict[str, pd.DataFrame] = {}
-
     for code, grp in combined.groupby("code"):
         code = str(code).strip()
         if not code or code == "nan":
@@ -284,28 +304,18 @@ def fetch_ohlc_history(
         grp = grp.sort_values("_date").drop_duplicates("_date")
         idx = pd.to_datetime(grp["_date"])
 
-        def _col(grp, name: str):
-            if name in grp.columns:
-                v = grp[name].values
-                return v
-            return grp["close"].values
-
         df_out = pd.DataFrame(
             {
-                "Open":   _col(grp, "open"),
-                "High":   _col(grp, "high"),
-                "Low":    _col(grp, "low"),
+                "Open":   grp["open"].values   if "open"   in grp.columns else grp["close"].values,
+                "High":   grp["high"].values   if "high"   in grp.columns else grp["close"].values,
+                "Low":    grp["low"].values    if "low"    in grp.columns else grp["close"].values,
                 "Close":  grp["close"].values,
-                "Volume": _col(grp, "volume"),
+                "Volume": grp["volume"].values  if "volume" in grp.columns else [0.0] * len(grp),
             },
             index=idx,
         )
         df_out.index.name = "Date"
         df_out["Volume"] = pd.to_numeric(df_out["Volume"], errors="coerce").fillna(0)
-        # Open/High/Low が全 NaN（旧フォーマット）なら Close で補完
-        for col in ("Open", "High", "Low"):
-            if df_out[col].isna().all():
-                df_out[col] = df_out["Close"]
         df_out = df_out.dropna(subset=["Close"])
         if len(df_out) < 20:
             continue
@@ -316,21 +326,32 @@ def fetch_ohlc_history(
 
 
 # ==========================================
-# 公開 API（既存）
+# 公開 API（Session統一版）
 # ==========================================
 def fetch_stock_prices(user_id: str, password: str) -> pd.DataFrame:
-    return _fetch_csv(PRICES_URL, user_id, password, PRICE_COLUMNS)
+    session = _make_session(user_id, password)
+    return _fetch_csv_latest(
+        PRICES_URL_LATEST, PRICES_URL, session, PRICE_COLUMNS
+    )
 
 
 def fetch_stock_indicators(user_id: str, password: str) -> pd.DataFrame:
-    return _fetch_csv(INDICATORS_URL, user_id, password, INDICATOR_COLUMNS)
+    session = _make_session(user_id, password)
+    return _fetch_csv_latest(
+        INDICATORS_URL_LATEST, INDICATORS_URL, session, INDICATOR_COLUMNS
+    )
 
 
 def fetch_merged_data(user_id: str, password: str) -> pd.DataFrame:
-    prices = fetch_stock_prices(user_id, password)
+    session = _make_session(user_id, password)
+    prices = _fetch_csv_latest(
+        PRICES_URL_LATEST, PRICES_URL, session, PRICE_COLUMNS
+    )
     if prices.empty:
         return prices
-    indicators = fetch_stock_indicators(user_id, password)
+    indicators = _fetch_csv_latest(
+        INDICATORS_URL_LATEST, INDICATORS_URL, session, INDICATOR_COLUMNS
+    )
     if indicators.empty:
         return prices
     ind_cols = [c for c in indicators.columns
@@ -341,79 +362,60 @@ def fetch_merged_data(user_id: str, password: str) -> pd.DataFrame:
 
 
 def build_info_lookup(merged_df: pd.DataFrame) -> dict:
-    """
-    KABU+ データから {ticker: info_dict} の辞書を構築。
-    fetch_data.py で yf.Ticker().info の代替として使う。
-    キーは "1234.T" 形式。
-    """
     lookup = {}
     if merged_df.empty:
         return lookup
-
     for _, row in merged_df.iterrows():
         code = str(row.get("code", ""))
         if not code:
             continue
         ticker = f"{code}.T"
-        mcap_m = row.get("market_cap_m", 0) or 0
-        shares = row.get("shares_outstanding", 0) or 0
-        pbr_val = row.get("pbr", None)
-        price = row.get("price", 0) or 0
-        name = str(row.get("name", ""))
-
+        mcap_m   = row.get("market_cap_m", 0) or 0
+        shares   = row.get("shares_outstanding", 0) or 0
+        pbr_val  = row.get("pbr", None)
+        price    = row.get("price", 0) or 0
+        name     = str(row.get("name", ""))
         if (not shares or shares <= 0) and mcap_m > 0 and price > 0:
             shares = int(mcap_m * 1_000_000 / price)
-
         lookup[ticker] = {
-            "marketCap": int(mcap_m * 1_000_000) if mcap_m else 0,
-            "sharesOutstanding": int(shares) if shares else None,
-            "priceToBook": float(pbr_val) if pbr_val and pbr_val > 0 else None,
-            "shortName": name,
-            "longName": name,
-            "currentPrice": float(price) if price else None,
-            "dividendRate": float(row.get("dividend_per_share", 0) or 0),
-            "dividendYield": float(row.get("dividend_yield", 0) or 0) / 100.0 if row.get("dividend_yield") else None,
+            "marketCap":                  int(mcap_m * 1_000_000) if mcap_m else 0,
+            "sharesOutstanding":          int(shares) if shares else None,
+            "priceToBook":                float(pbr_val) if pbr_val and pbr_val > 0 else None,
+            "shortName":                  name,
+            "longName":                   name,
+            "currentPrice":               float(price) if price else None,
+            "dividendRate":               float(row.get("dividend_per_share", 0) or 0),
+            "dividendYield":              float(row.get("dividend_yield", 0) or 0) / 100.0
+                                          if row.get("dividend_yield") else None,
             "trailingAnnualDividendRate": None,
             "trailingAnnualDividendYield": None,
-            "payoutRatio": None,
+            "payoutRatio":                None,
         }
     return lookup
 
 
-# ==========================================
-# 信用取引残高データ（週次）
-# ==========================================
 def fetch_margin_data(user_id: str, password: str) -> pd.DataFrame:
-    """信用取引残高（週次）を一括取得"""
-    return _fetch_csv(MARGIN_URL, user_id, password, MARGIN_COLUMNS, max_days_back=14)
+    session = _make_session(user_id, password)
+    return _fetch_csv_latest(
+        MARGIN_URL_LATEST, MARGIN_URL, session, MARGIN_COLUMNS, max_days_back=14
+    )
 
 
 def build_margin_lookup(margin_df: pd.DataFrame) -> dict:
-    """
-    信用残高データから {ticker: margin_dict} の辞書を構築。
-    キーは "1234.T" 形式。
-    """
     lookup = {}
     if margin_df.empty:
         return lookup
-
     for _, row in margin_df.iterrows():
         code = str(row.get("code", ""))
         if not code:
             continue
         ticker = f"{code}.T"
-
-        buy = row.get("margin_buy", 0) or 0
-        sell = row.get("margin_sell", 0) or 0
-        buy_chg = row.get("margin_buy_change", 0) or 0
-        sell_chg = row.get("margin_sell_change", 0) or 0
-        ratio = row.get("margin_ratio", 0) or 0
-
         lookup[ticker] = {
-            "margin_buy": int(buy) if buy else 0,
-            "margin_sell": int(sell) if sell else 0,
-            "margin_buy_change": int(buy_chg) if buy_chg else 0,
-            "margin_sell_change": int(sell_chg) if sell_chg else 0,
-            "margin_ratio": round(float(ratio), 2) if ratio else None,
+            "margin_buy":         int(row.get("margin_buy", 0) or 0),
+            "margin_sell":        int(row.get("margin_sell", 0) or 0),
+            "margin_buy_change":  int(row.get("margin_buy_change", 0) or 0),
+            "margin_sell_change": int(row.get("margin_sell_change", 0) or 0),
+            "margin_ratio":       round(float(row.get("margin_ratio", 0) or 0), 2)
+                                  if row.get("margin_ratio") else None,
         }
     return lookup
