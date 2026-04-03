@@ -1839,5 +1839,11 @@ def show_main_page():
 # ==========================================
 if "logged_in" not in st.session_state: st.session_state["logged_in"] = False
 if "cart" not in st.session_state: st.session_state["cart"] = []
+
+# ★ KABU+ データを起動時に事前読み込み（キャッシュに載せておく）
+# これにより1回目のハゲタカ診断でもタイムアウトしなくなる
+_load_kabuplus_info()
+_load_kabuplus_margin()
+
 if st.session_state.get("logged_in"): show_main_page()
 else: show_login_page()
