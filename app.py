@@ -42,7 +42,12 @@ import pytz
 import base64
 import pandas as pd
 import numpy as np
-import yfinance as yf
+try:
+    import yfinance as yf
+    _HAS_YF = True
+except ImportError:
+    yf = None
+    _HAS_YF = False
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -929,27 +934,27 @@ def _fetch_yf_data_with_retry(ticker: str, max_retries: int = 2, base_delay: flo
     """
     last_error = None
 
-    # 1) yf.download() で一括取得（stock.history()より高速）
-    for attempt in range(max_retries):
-        try:
-            session = get_yf_session()
-            hist = yf.download(
-                tickers=[ticker], period="2y", interval="1d",
-                auto_adjust=True, progress=False, threads=False,
-                session=session,
-            )
-            if hist is not None and not hist.empty and len(hist) >= 5:
-                # MultiIndex対策
-                if isinstance(hist.columns, pd.MultiIndex):
-                    hist.columns = hist.columns.get_level_values(0)
-                hist = hist[["Open", "High", "Low", "Close", "Volume"]].dropna()
-                if len(hist) >= 5:
-                    return hist
-            raise ValueError("データが空または不十分です")
-        except Exception as e:
-            last_error = e
-            if attempt < max_retries - 1:
-                time.sleep(base_delay * (2 ** attempt))
+    # 1) yf.download()（yfinance が利用可能な場合のみ）
+    if _HAS_YF:
+        for attempt in range(max_retries):
+            try:
+                session = get_yf_session()
+                hist = yf.download(
+                    tickers=[ticker], period="2y", interval="1d",
+                    auto_adjust=True, progress=False, threads=False,
+                    session=session,
+                )
+                if hist is not None and not hist.empty and len(hist) >= 5:
+                    if isinstance(hist.columns, pd.MultiIndex):
+                        hist.columns = hist.columns.get_level_values(0)
+                    hist = hist[["Open", "High", "Low", "Close", "Volume"]].dropna()
+                    if len(hist) >= 5:
+                        return hist
+                raise ValueError("データが空または不十分です")
+            except Exception as e:
+                last_error = e
+                if attempt < max_retries - 1:
+                    time.sleep(base_delay * (2 ** attempt))
 
     # 2) Yahoo Finance Chart API 直接呼び出し（yfinanceライブラリを迂回）
     hist_yc = _fetch_yahoo_chart_api(ticker)
@@ -1839,11 +1844,5 @@ def show_main_page():
 # ==========================================
 if "logged_in" not in st.session_state: st.session_state["logged_in"] = False
 if "cart" not in st.session_state: st.session_state["cart"] = []
-
-# ★ KABU+ データを起動時に事前読み込み（キャッシュに載せておく）
-# これにより1回目のハゲタカ診断でもタイムアウトしなくなる
-_load_kabuplus_info()
-_load_kabuplus_margin()
-
 if st.session_state.get("logged_in"): show_main_page()
 else: show_login_page()
