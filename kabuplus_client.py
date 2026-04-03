@@ -302,11 +302,10 @@ def fetch_merged_data(user_id, password):
     indicators = fetch_stock_indicators(user_id, password)
     if indicators.empty:
         return prices
+    # 指標DF から prices と重複する非キー列（name/market/industry）を除外してマージ
     ind_cols = [c for c in indicators.columns
-                if c not in ("name", "market", "industry") or c == "code"]
-    return prices.merge(ind_cols if False else
-                        indicators[ind_cols],
-                        on="code", how="left", suffixes=("", "_ind"))
+                if c == "code" or c not in ("name", "market", "industry")]
+    return prices.merge(indicators[ind_cols], on="code", how="left", suffixes=("", "_ind"))
 
 def _safe_float(v, default=0.0):
     """NaN/None を default に変換して float を返す"""
