@@ -87,7 +87,9 @@ def _fetch_csv(url_template, user_id, password, col_map, max_days_back=7):
     """v1から動作実績あり。Session不使用のまま維持。"""
     auth = HTTPBasicAuth(user_id, password)
     for days_back in range(max_days_back):
-        target = datetime.now() - timedelta(days=days_back)
+        import pytz as _pytz
+        _JST = _pytz.timezone("Asia/Tokyo")
+        target = datetime.now(_JST) - timedelta(days=days_back)
         date_str = target.strftime("%Y%m%d")
         url = url_template.format(date=date_str)
         try:
@@ -114,7 +116,11 @@ def _clean_numeric(df):
         "price", "change", "change_pct", "prev_close", "open", "high", "low",
         "vwap", "volume", "turnover_rate", "trading_value_k", "market_cap_m",
         "ytd_high", "ytd_high_deviation", "ytd_low", "ytd_low_deviation",
-        "per", "pbr", "eps", "bps", "dividend_yield", "shares_outstanding",
+        "per", "pbr", "eps", "bps",
+        "dividend_yield", "dividend_per_share",
+        "shares_outstanding",
+        "margin_buy", "margin_sell", "margin_buy_change", "margin_sell_change",
+        "margin_ratio",
     ]
     for col in cols:
         if col in df.columns:
@@ -212,7 +218,9 @@ def fetch_ohlc_history(
     最初の10件はverbose=Trueで失敗理由を表示。
     """
     auth = HTTPBasicAuth(user_id, password)
-    today = datetime.now().date()
+    import pytz as _pytz
+    _JST = _pytz.timezone("Asia/Tokyo")
+    today = datetime.now(_JST).date()
     frames_by_date: dict[date_t, pd.DataFrame] = {}
 
     print(f"  📡 OHLC逐次取得開始（目標{lookback_days}営業日 / 間隔{request_interval}s）")
