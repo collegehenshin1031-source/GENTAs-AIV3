@@ -1727,10 +1727,8 @@ def main():
     print(f"🎯 対象: 時価総額 {MARKET_CAP_MIN}億〜{MARKET_CAP_MAX}億円（候補フィルタ）")
     print(f"📋 スキャン銘柄数: {len(universe)} （FULL_UNIVERSE={os.environ.get('FULL_UNIVERSE', '0')}）")
 
-    # ★ KABU+ から全銘柄の指標データを一括取得（1-2秒）
+    # ★ KABU+ 指標データ（時価総額・PBR等）
     kabuplus_info = {}
-    margin_lookup = {}
-    ohlc_cache: dict = {}
     try:
         import kabuplus_client as kp
         kp_id, kp_pw = kp.get_credentials()
@@ -1742,8 +1740,17 @@ def main():
                 print(f"  → KABU+ {len(kabuplus_info)}銘柄の指標データ取得完了")
             else:
                 print("  ⚠️ KABU+ 指標データ取得失敗（休日の可能性）")
+        else:
+            print("  ⚠️ KABU+ 認証情報なし")
+    except Exception as e:
+        print(f"  ⚠️ KABU+ 指標エラー: {e}")
 
-            # ★ 信用残高データ（週次）
+    # ★ 信用残高データ（週次）
+    margin_lookup = {}
+    try:
+        import kabuplus_client as kp
+        kp_id, kp_pw = kp.get_credentials()
+        if kp_id and kp_pw:
             print("📡 KABU+ 信用残高データ取得中...")
             margin_df = kp.fetch_margin_data(kp_id, kp_pw)
             if not margin_df.empty:
@@ -1751,16 +1758,23 @@ def main():
                 print(f"  → 信用残高 {len(margin_lookup)}銘柄取得完了")
             else:
                 print("  ⚠️ 信用残高データ取得失敗")
+    except Exception as e:
+        print(f"  ⚠️ 信用残高エラー: {e}")
 
-            # ★ 四本値OHLC履歴（yfinance 完全置換）
-            print("📡 KABU+ 四本値履歴データ並列取得中（最大250営業日）...")
+    # ★ 四本値OHLC履歴（yfinance 完全置換）
+    ohlc_cache: dict = {}
+    try:
+        import kabuplus_client as kp
+        kp_id, kp_pw = kp.get_credentials()
+        if kp_id and kp_pw:
+            print("📡 KABU+ 四本値履歴データ取得中（最大250営業日）...")
             ohlc_cache = kp.fetch_ohlc_history(kp_id, kp_pw, lookback_days=250)
             if not ohlc_cache:
                 print("  ⚠️ OHLC履歴データ取得失敗（全銘柄スキップの可能性）")
         else:
-            print("  ⚠️ KABU+ 認証情報なし → OHLCデータなし（処理対象ゼロになります）")
+            print("  ⚠️ KABU+ 認証情報なし → OHLCデータなし")
     except Exception as e:
-        print(f"  ⚠️ KABU+ エラー: {e}")
+        print(f"  ⚠️ OHLC取得エラー: {e}")
 
     # ══ 診断ログ ══════════════════════════════════════════
     print("\n" + "─" * 60)
