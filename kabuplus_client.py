@@ -345,7 +345,7 @@ def build_margin_lookup(margin_df):
         return lookup
     for _, row in margin_df.iterrows():
         code = str(row.get("code", ""))
-        if not code:
+        if not code or code == "nan":
             continue
         ticker = f"{code}.T"
         lookup[ticker] = {
@@ -354,6 +354,6 @@ def build_margin_lookup(margin_df):
             "margin_buy_change":  int(_safe_float(row.get("margin_buy_change"))),
             "margin_sell_change": int(_safe_float(row.get("margin_sell_change"))),
             "margin_ratio":       round(_safe_float(row.get("margin_ratio")), 2)
-                                  if _safe_float(row.get("margin_ratio")) else None,
+                                  if _safe_float(row.get("margin_ratio")) > 0 else None,
         }
     return lookup
