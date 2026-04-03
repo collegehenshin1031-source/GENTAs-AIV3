@@ -293,32 +293,43 @@ def fetch_merged_data(user_id, password):
                         indicators[ind_cols],
                         on="code", how="left", suffixes=("", "_ind"))
 
+def _safe_float(v, default=0.0):
+    """NaN/None を default に変換して float を返す"""
+    import math
+    try:
+        f = float(v)
+        return default if math.isnan(f) or math.isinf(f) else f
+    except (TypeError, ValueError):
+        return default
+
 def build_info_lookup(merged_df):
     lookup = {}
     if merged_df.empty:
         return lookup
     for _, row in merged_df.iterrows():
         code = str(row.get("code", ""))
-        if not code:
+        if not code or code == "nan":
             continue
         ticker = f"{code}.T"
-        mcap_m  = row.get("market_cap_m", 0) or 0
-        shares  = row.get("shares_outstanding", 0) or 0
-        pbr_val = row.get("pbr", None)
-        price   = row.get("price", 0) or 0
-        name    = str(row.get("name", ""))
-        if (not shares or shares <= 0) and mcap_m > 0 and price > 0:
-            shares = int(mcap_m * 1_000_000 / price)
+        mcap_m  = _safe_float(row.get("market_cap_m"))
+        shares  = _safe_float(row.get("shares_outstanding"))
+        pbr_val = _safe_float(row.get("pbr"))
+        price   = _safe_float(row.get("price"))
+        name    = str(row.get("name", "") or "")
+
+        if shares <= 0 and mcap_m > 0 and price > 0:
+            shares = mcap_m * 1_000_000 / price
+
         lookup[ticker] = {
-            "marketCap":                   int(mcap_m * 1_000_000) if mcap_m else 0,
-            "sharesOutstanding":           int(shares) if shares else None,
-            "priceToBook":                 float(pbr_val) if pbr_val and pbr_val > 0 else None,
+            "marketCap":                   int(mcap_m * 1_000_000) if mcap_m > 0 else 0,
+            "sharesOutstanding":           int(shares) if shares > 0 else None,
+            "priceToBook":                 float(pbr_val) if pbr_val > 0 else None,
             "shortName":                   name,
             "longName":                    name,
-            "currentPrice":                float(price) if price else None,
-            "dividendRate":                float(row.get("dividend_per_share", 0) or 0),
-            "dividendYield":               float(row.get("dividend_yield", 0) or 0) / 100.0
-                                           if row.get("dividend_yield") else None,
+            "currentPrice":                float(price) if price > 0 else None,
+            "dividendRate":                _safe_float(row.get("dividend_per_share")),
+            "dividendYield":               _safe_float(row.get("dividend_yield")) / 100.0
+                                           if _safe_float(row.get("dividend_yield")) else None,
             "trailingAnnualDividendRate":  None,
             "trailingAnnualDividendYield": None,
             "payoutRatio":                 None,
