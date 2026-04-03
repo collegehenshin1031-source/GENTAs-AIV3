@@ -10,6 +10,8 @@ permissions:
   contents: write
 
 env:
+  KABUPLUS_ID: ${{ secrets.KABUPLUS_ID }}
+  KABUPLUS_PASSWORD: ${{ secrets.KABUPLUS_PASSWORD }}
   FULL_UNIVERSE: "1"
 
 jobs:
