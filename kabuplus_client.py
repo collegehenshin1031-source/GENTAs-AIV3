@@ -362,12 +362,26 @@ def build_margin_lookup(margin_df):
         if not code or code == "nan":
             continue
         ticker = f"{code}.T"
+        mb  = int(_safe_float(row.get("margin_buy")))
+        ms  = int(_safe_float(row.get("margin_sell")))
+        mbc = int(_safe_float(row.get("margin_buy_change")))
+        msc = int(_safe_float(row.get("margin_sell_change")))
+        # margin_ratio: CSVが "-" や空の場合は _safe_float が 0.0 を返す。
+        # 売残0 で買残あり → ratio は計算不能（∞）なので None だが買残は表示する。
+        raw_ratio = _safe_float(row.get("margin_ratio"))
+        if raw_ratio > 0:
+            mr = round(raw_ratio, 2)
+        elif ms == 0 and mb > 0:
+            mr = None  # 売残0 = 計算不能（買い一方的）
+        else:
+            mr = None
+        # 買残・売残がどちらも0の銘柄はCSVに存在するが意味がないのでスキップしない
+        # （表示側で判断）
         lookup[ticker] = {
-            "margin_buy":         int(_safe_float(row.get("margin_buy"))),
-            "margin_sell":        int(_safe_float(row.get("margin_sell"))),
-            "margin_buy_change":  int(_safe_float(row.get("margin_buy_change"))),
-            "margin_sell_change": int(_safe_float(row.get("margin_sell_change"))),
-            "margin_ratio":       round(_safe_float(row.get("margin_ratio")), 2)
-                                  if _safe_float(row.get("margin_ratio")) > 0 else None,
+            "margin_buy":         mb,
+            "margin_sell":        ms,
+            "margin_buy_change":  mbc,
+            "margin_sell_change": msc,
+            "margin_ratio":       mr,
         }
     return lookup
