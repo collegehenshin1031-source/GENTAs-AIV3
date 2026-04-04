@@ -111,7 +111,6 @@ yf_session = get_yf_session()
 # ==========================================
 # 【KABU+ 一括データ】診断用の銘柄情報キャッシュ
 # ==========================================
-@st.cache_data(ttl=900, show_spinner=False)
 @st.cache_data(ttl=3600, show_spinner=False)
 def _load_kabuplus_info() -> dict:
     """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築（1時間キャッシュ）"""
@@ -133,22 +132,42 @@ def _get_kabuplus_info(ticker: str) -> dict:
     return _load_kabuplus_info().get(ticker, {})
 
 
-@st.cache_data(ttl=21600, show_spinner=False)  # 6時間キャッシュ（週次データなので長めに保持）
 def _load_kabuplus_margin() -> dict:
     """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築。
     信用残高は週次（金曜日更新）のため、直近金曜のCSVを優先取得する。
+    取得成功時のみ session_state にキャッシュ（6時間）。
+    空データはキャッシュしないことで、再起動なしに次回取得を試みる。
     """
+    import time
+    CACHE_KEY = "_margin_cache"
+    CACHE_TS   = "_margin_cache_ts"
+    TTL = 21600  # 6時間（週次データ）
+
+    # session_state キャッシュヒット確認
+    now = time.time()
+    cached = st.session_state.get(CACHE_KEY)
+    cached_ts = st.session_state.get(CACHE_TS, 0)
+    if cached is not None and (now - cached_ts) < TTL:
+        return cached
+
+    # KABU+ から取得
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
             return {}
         margin_df = kp.fetch_margin_data(uid, pwd)
         if margin_df.empty:
-            return {}
-        return kp.build_margin_lookup(margin_df)
+            print("⚠️ [_load_kabuplus_margin] KABU+信用残高CSV空（金曜CSVが未公開の可能性）")
+            return {}  # 空はキャッシュしない
+        result = kp.build_margin_lookup(margin_df)
+        if result:
+            st.session_state[CACHE_KEY] = result
+            st.session_state[CACHE_TS]  = now
+            print(f"✅ [_load_kabuplus_margin] {len(result)}銘柄 取得・キャッシュ完了")
+        return result
     except Exception as e:
         print(f"⚠️ [_load_kabuplus_margin] 取得失敗: {e}")
-        return {}
+        return {}  # 空はキャッシュしない
 
 # ==========================================
 # カート操作のコールバック関数（即時反映用）
@@ -919,7 +938,8 @@ def _fetch_yahoo_chart_api(ticker: str) -> pd.DataFrame | None:
             return None
         df["Volume"] = df["Volume"].fillna(0)
         return df
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ [_fetch_yahoo_chart_api] {ticker}: {type(e).__name__}: {e}")
         return None
 
 
@@ -967,7 +987,8 @@ def _fetch_kabuoji3(ticker: str) -> pd.DataFrame | None:
         df = df.dropna(subset=["Date"]).set_index("Date").sort_index()
         df["Volume"] = df["Volume"].fillna(0)
         return df if len(df) >= 5 else None
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ [_fetch_kabuoji3] {ticker}: {type(e).__name__}: {e}")
         return None
 
 
@@ -1280,7 +1301,8 @@ def _evaluate_stock_cached(ticker):
 def evaluate_stock(ticker):
     try:
         return _evaluate_stock_cached(ticker)
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ [evaluate_stock] {ticker} 取得失敗: {type(e).__name__}: {e}")
         return None
 
 def draw_chart(row, chart_key: str | None = None):
