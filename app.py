@@ -1743,13 +1743,27 @@ def show_main_page():
                                     st.write(f"時価総額: **{diag_data['時価総額_表示']}**")
                                     st.write(f"配当情報: **{diag_data['dividend_text']}**")
                                     st.write(f"商い熱量: **{diag_data['turnover_str']}**")
-                                    # ★ 信用需給はキャッシュ外でリアルタイム取得
+                                    # ★ 信用需給: KABU+ライブ → ratios.json の順でフォールバック
+                                    _diag_ticker = f"{code}.T"  # Bug修正: ticker→_diag_ticker（スコープ明確化）
                                     try:
+                                        # Step1: KABU+ ライブ取得
                                         _kp_margin = _load_kabuplus_margin()
-                                        _mg = _kp_margin.get(ticker, {})
+                                        _mg = _kp_margin.get(_diag_ticker, {})
                                         _mg_ratio = _mg.get("margin_ratio")
-                                        _mg_buy = _mg.get("margin_buy", 0)
-                                        _mg_sell = _mg.get("margin_sell", 0)
+                                        _mg_buy  = int(_mg.get("margin_buy",  0) or 0)
+                                        _mg_sell = int(_mg.get("margin_sell", 0) or 0)
+
+                                        # Step2: KABU+ で取れなければ ratios.json から取得
+                                        if _mg_ratio is None and _mg_buy == 0 and _mg_sell == 0:
+                                            _rdata = load_data()
+                                            for _bucket in ("data", "all_data"):
+                                                _item = (_rdata.get(_bucket) or {}).get(_diag_ticker, {})
+                                                if _item:
+                                                    _mg_ratio = _item.get("margin_ratio")
+                                                    _mg_buy   = int(_item.get("margin_buy",  0) or 0)
+                                                    _mg_sell  = int(_item.get("margin_sell", 0) or 0)
+                                                    break
+
                                         if _mg_ratio is not None and _mg_ratio > 0:
                                             if _mg_ratio < 1.0:
                                                 _margin_str = f"📊 売り優勢（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
@@ -1761,7 +1775,8 @@ def show_main_page():
                                             _margin_str = f"📊 買残{_mg_buy:,} / 売残{_mg_sell:,}"
                                         else:
                                             _margin_str = "📊 データなし"
-                                    except Exception:
+                                    except Exception as _e:
+                                        print(f"⚠️ [margin display] {_diag_ticker}: {_e}")
                                         _margin_str = "📊 データなし"
                                     st.write(f"信用需給: **{_margin_str}**")
                                     
