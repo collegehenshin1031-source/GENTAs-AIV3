@@ -90,13 +90,30 @@ def get_credentials() -> Tuple[Optional[str], Optional[str]]:
 # ==========================================
 # 実績済み CSV 取得（Session不使用・従来通り）
 # ==========================================
-def _fetch_csv(url_template, user_id, password, col_map, max_days_back=7):
-    """v1から動作実績あり。Session不使用のまま維持。"""
+def _fetch_csv(url_template, user_id, password, col_map, max_days_back=7, weekly=False):
+    """v1から動作実績あり。Session不使用のまま維持。
+
+    weekly=True の場合、直近の金曜日から遡って最大5週分を試みる。
+    週次CSVは毎週金曜日付のファイル名で公開されるため、
+    日付を1日ずつ遡ると金曜以外は全て404になり非効率。
+    """
     auth = HTTPBasicAuth(user_id, password)
-    for days_back in range(max_days_back):
-        import pytz as _pytz
-        _JST = _pytz.timezone("Asia/Tokyo")
-        target = datetime.now(_JST) - timedelta(days=days_back)
+    import pytz as _pytz
+    _JST = _pytz.timezone("Asia/Tokyo")
+    today = datetime.now(_JST)
+
+    if weekly:
+        # 直近の金曜日を起点に、最大5週前まで試みる
+        dates_to_try = []
+        for weeks_back in range(5):
+            # 今日から直近の金曜（weekday=4）を求める
+            days_since_friday = (today.weekday() - 4) % 7
+            friday = today - timedelta(days=days_since_friday + weeks_back * 7)
+            dates_to_try.append(friday)
+    else:
+        dates_to_try = [today - timedelta(days=d) for d in range(max_days_back)]
+
+    for target in dates_to_try:
         date_str = target.strftime("%Y%m%d")
         url = url_template.format(date=date_str)
         try:
@@ -112,6 +129,7 @@ def _fetch_csv(url_template, user_id, password, col_map, max_days_back=7):
             if "code" in df.columns:
                 df["code"] = df["code"].astype(str).str.strip()
             df = _clean_numeric(df)
+            print(f"  ✅ [_fetch_csv] {url_template.split('/')[-1][:30]}... → {date_str} で取得成功 ({len(df)}行)")
             return df
         except Exception:
             continue
@@ -351,7 +369,7 @@ def build_info_lookup(merged_df):
     return lookup
 
 def fetch_margin_data(user_id, password):
-    return _fetch_csv(MARGIN_URL, user_id, password, MARGIN_COLUMNS, max_days_back=14)
+    return _fetch_csv(MARGIN_URL, user_id, password, MARGIN_COLUMNS, weekly=True)
 
 def build_margin_lookup(margin_df):
     lookup = {}
