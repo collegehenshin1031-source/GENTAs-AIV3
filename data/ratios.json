@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-04-04 13:26:29",
+  "updated_at": "2026-04-04 18:05:35",
   "date": "2026-04-04",
   "market_cap_range": "300億〜2000億円",
   "total_count": 120,
@@ -37,7 +37,7 @@
         "range_compression": 0.0,
         "lower_shadow": 58.8
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 79.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -48,7 +48,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -124,7 +124,7 @@
         "range_compression": 0.0,
         "lower_shadow": 44.2
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 75.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -135,7 +135,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -168,7 +168,7 @@
         "range_compression": 0.0,
         "lower_shadow": 54.2
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 73.5,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -178,7 +178,7 @@
       "tags": [
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -211,7 +211,7 @@
         "range_compression": 47.4,
         "lower_shadow": 40.0
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 65.4,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -222,7 +222,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -255,7 +255,7 @@
         "range_compression": 92.4,
         "lower_shadow": 80.0
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 73.4,
       "event_score": 0.0,
       "display_state": "観測中",
@@ -264,7 +264,7 @@
       "support_gap_pct": 2.4,
       "tags": [
         "下側ゾーン",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -297,7 +297,7 @@
         "range_compression": 0.0,
         "lower_shadow": 50.4
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 67.8,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -308,7 +308,7 @@
         "上側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -383,7 +383,7 @@
         "range_compression": 20.0,
         "lower_shadow": 0.0
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 66.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -394,7 +394,7 @@
         "上側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -427,7 +427,7 @@
         "range_compression": 0.0,
         "lower_shadow": 33.0
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 69.6,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -438,7 +438,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -758,7 +758,7 @@
         "range_compression": 0.0,
         "lower_shadow": 49.1
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 60.0,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -768,7 +768,7 @@
       "tags": [
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -1292,7 +1292,7 @@
         "range_compression": 0.0,
         "lower_shadow": 49.7
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 43.7,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -1303,7 +1303,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -4967,7 +4967,7 @@
         "range_compression": 0.0,
         "lower_shadow": 58.8
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 79.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -4978,7 +4978,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5054,7 +5054,7 @@
         "range_compression": 0.0,
         "lower_shadow": 44.2
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 75.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5065,7 +5065,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5098,7 +5098,7 @@
         "range_compression": 0.0,
         "lower_shadow": 54.2
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 73.5,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5108,7 +5108,7 @@
       "tags": [
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5141,7 +5141,7 @@
         "range_compression": 47.4,
         "lower_shadow": 40.0
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 65.4,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5152,7 +5152,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5185,7 +5185,7 @@
         "range_compression": 92.4,
         "lower_shadow": 80.0
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 73.4,
       "event_score": 0.0,
       "display_state": "観測中",
@@ -5194,7 +5194,7 @@
       "support_gap_pct": 2.4,
       "tags": [
         "下側ゾーン",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5227,7 +5227,7 @@
         "range_compression": 0.0,
         "lower_shadow": 50.4
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 67.8,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5238,7 +5238,7 @@
         "上側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5313,7 +5313,7 @@
         "range_compression": 20.0,
         "lower_shadow": 0.0
       },
-      "flow_streak_high": 4,
+      "flow_streak_high": 5,
       "reorg_score": 66.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5324,7 +5324,7 @@
         "上側ゾーン",
         "要監視",
         "出来高変化",
-        "継続4日"
+        "継続5日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5357,7 +5357,7 @@
         "range_compression": 0.0,
         "lower_shadow": 33.0
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 69.6,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5368,7 +5368,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -5688,7 +5688,7 @@
         "range_compression": 0.0,
         "lower_shadow": 49.1
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 60.0,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -5698,7 +5698,7 @@
       "tags": [
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
@@ -6464,7 +6464,7 @@
         "range_compression": 0.0,
         "lower_shadow": 49.7
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 43.7,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -6475,7 +6475,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 0,
       "margin_sell": 0,
