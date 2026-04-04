@@ -93,9 +93,9 @@ def get_credentials() -> Tuple[Optional[str], Optional[str]]:
 def _fetch_csv(url_template, user_id, password, col_map, max_days_back=7, weekly=False):
     """v1から動作実績あり。Session不使用のまま維持。
 
-    weekly=True の場合、直近の金曜日から遡って最大5週分を試みる。
-    週次CSVは毎週金曜日付のファイル名で公開されるため、
-    日付を1日ずつ遡ると金曜以外は全て404になり非効率。
+    weekly=True の場合、直近の金曜日から遡って最大8週分を試みる。
+    週次CSVは毎週金曜日付のファイル名で公開されるが、
+    KABU+の公開タイミングが翌週月曜になる場合もあるため週数を多めに確保。
     """
     auth = HTTPBasicAuth(user_id, password)
     import pytz as _pytz
@@ -103,36 +103,48 @@ def _fetch_csv(url_template, user_id, password, col_map, max_days_back=7, weekly
     today = datetime.now(_JST)
 
     if weekly:
-        # 直近の金曜日を起点に、最大5週前まで試みる
+        # 直近の金曜日を起点に、最大8週前まで試みる
         dates_to_try = []
-        for weeks_back in range(5):
-            # 今日から直近の金曜（weekday=4）を求める
-            days_since_friday = (today.weekday() - 4) % 7
+        days_since_friday = (today.weekday() - 4) % 7
+        for weeks_back in range(8):
             friday = today - timedelta(days=days_since_friday + weeks_back * 7)
             dates_to_try.append(friday)
+        print(f"  📅 [_fetch_csv/weekly] 試行日付: {[d.strftime('%Y%m%d') for d in dates_to_try[:3]]} ...")
     else:
         dates_to_try = [today - timedelta(days=d) for d in range(max_days_back)]
 
+    tried = []
     for target in dates_to_try:
         date_str = target.strftime("%Y%m%d")
         url = url_template.format(date=date_str)
+        tried.append(date_str)
         try:
             resp = requests.get(url, auth=auth, timeout=60)
+            if resp.status_code == 404:
+                continue  # 祝日・未公開 → 次の日付へ
+            if resp.status_code == 401:
+                print(f"  ❌ [_fetch_csv] 401 Unauthorized → KABU+ 認証情報を確認してください")
+                return pd.DataFrame()
             if resp.status_code != 200:
+                print(f"  ⚠️ [_fetch_csv] HTTP {resp.status_code} for {date_str}")
                 continue
             text = resp.content.decode("shift-jis", errors="replace")
             df = pd.read_csv(io.StringIO(text))
             if len(df) < 100:
+                print(f"  ⚠️ [_fetch_csv] {date_str}: 行数不足 ({len(df)}行) → スキップ")
                 continue
             rename = {k: v for k, v in col_map.items() if k in df.columns}
             df = df.rename(columns=rename)
             if "code" in df.columns:
                 df["code"] = df["code"].astype(str).str.strip()
             df = _clean_numeric(df)
-            print(f"  ✅ [_fetch_csv] {url_template.split('/')[-1][:30]}... → {date_str} で取得成功 ({len(df)}行)")
+            print(f"  ✅ [_fetch_csv] {url_template.split('/')[-1][:35]}... → {date_str} 取得成功 ({len(df)}行)")
             return df
-        except Exception:
+        except Exception as e:
+            print(f"  ⚠️ [_fetch_csv] {date_str} 例外: {e}")
             continue
+
+    print(f"  ❌ [_fetch_csv] 全日付で取得失敗。試行: {tried}")
     return pd.DataFrame()
 
 
@@ -369,7 +381,10 @@ def build_info_lookup(merged_df):
     return lookup
 
 def fetch_margin_data(user_id, password):
-    return _fetch_csv(MARGIN_URL, user_id, password, MARGIN_COLUMNS, weekly=True)
+    # 信用残高CSVは週次だが「公開日」が翌週第2営業日（基本火曜）のため、
+    # ファイル名が「金曜日付」か「公開日（火曜）付」かが不明。
+    # max_days_back=14 の日次遡りが最も安全（どちらのパターンでも14日以内にヒット）。
+    return _fetch_csv(MARGIN_URL, user_id, password, MARGIN_COLUMNS, max_days_back=14)
 
 def build_margin_lookup(margin_df):
     lookup = {}
