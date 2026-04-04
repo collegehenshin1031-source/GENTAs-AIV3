@@ -1748,13 +1748,14 @@ def show_main_page():
                                     try:
                                         # Step1: KABU+ ライブ取得
                                         _kp_margin = _load_kabuplus_margin()
+                                        _in_margin_csv = _diag_ticker in _kp_margin  # CSVに存在するか
                                         _mg = _kp_margin.get(_diag_ticker, {})
                                         _mg_ratio = _mg.get("margin_ratio")
                                         _mg_buy  = int(_mg.get("margin_buy",  0) or 0)
                                         _mg_sell = int(_mg.get("margin_sell", 0) or 0)
 
-                                        # Step2: KABU+ で取れなければ ratios.json から取得
-                                        if _mg_ratio is None and _mg_buy == 0 and _mg_sell == 0:
+                                        # Step2: KABU+ に存在しない場合のみ ratios.json から取得
+                                        if not _in_margin_csv:
                                             _rdata = load_data()
                                             for _bucket in ("data", "all_data"):
                                                 _item = (_rdata.get(_bucket) or {}).get(_diag_ticker, {})
@@ -1764,6 +1765,7 @@ def show_main_page():
                                                     _mg_sell  = int(_item.get("margin_sell", 0) or 0)
                                                     break
 
+                                        # 表示文字列の決定
                                         if _mg_ratio is not None and _mg_ratio > 0:
                                             if _mg_ratio < 1.0:
                                                 _margin_str = f"📊 売り優勢（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
@@ -1771,10 +1773,17 @@ def show_main_page():
                                                 _margin_str = f"📊 拮抗（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
                                             else:
                                                 _margin_str = f"📊 買残過多（貸借倍率: {_mg_ratio:.2f}倍）買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                        elif _mg_buy > 0 and _mg_sell == 0:
+                                            # 信用売残ゼロ（倍率算出不可）だが買残は表示
+                                            _margin_str = f"📊 買残{_mg_buy:,}（売残なし・倍率算出不可）"
                                         elif _mg_buy > 0 or _mg_sell > 0:
                                             _margin_str = f"📊 買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                        elif _in_margin_csv:
+                                            # CSVには存在するが残高ゼロ
+                                            _margin_str = "📊 残高なし（信用取引不活発）"
                                         else:
-                                            _margin_str = "📊 データなし"
+                                            # CSVに存在しない＝貸借銘柄でない or 信用取引不可
+                                            _margin_str = "📊 対象外（貸借銘柄でない可能性）"
                                     except Exception as _e:
                                         print(f"⚠️ [margin display] {_diag_ticker}: {_e}")
                                         _margin_str = "📊 データなし"
