@@ -133,9 +133,11 @@ def _get_kabuplus_info(ticker: str) -> dict:
     return _load_kabuplus_info().get(ticker, {})
 
 
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=21600, show_spinner=False)  # 6時間キャッシュ（週次データなので長めに保持）
 def _load_kabuplus_margin() -> dict:
-    """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築（1時間キャッシュ）"""
+    """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築。
+    信用残高は週次（金曜日更新）のため、直近金曜のCSVを優先取得する。
+    """
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
@@ -144,7 +146,8 @@ def _load_kabuplus_margin() -> dict:
         if margin_df.empty:
             return {}
         return kp.build_margin_lookup(margin_df)
-    except Exception:
+    except Exception as e:
+        print(f"⚠️ [_load_kabuplus_margin] 取得失敗: {e}")
         return {}
 
 # ==========================================
@@ -1748,21 +1751,24 @@ def show_main_page():
                                     try:
                                         # Step1: KABU+ ライブ取得
                                         _kp_margin = _load_kabuplus_margin()
-                                        _in_margin_csv = _diag_ticker in _kp_margin  # CSVに存在するか
+                                        _fetch_succeeded = len(_kp_margin) > 0  # 取得成功か（空＝週末・祝日等）
+                                        _in_margin_csv = _diag_ticker in _kp_margin  # CSVに銘柄が存在するか
                                         _mg = _kp_margin.get(_diag_ticker, {})
                                         _mg_ratio = _mg.get("margin_ratio")
                                         _mg_buy  = int(_mg.get("margin_buy",  0) or 0)
                                         _mg_sell = int(_mg.get("margin_sell", 0) or 0)
 
-                                        # Step2: KABU+ に存在しない場合のみ ratios.json から取得
-                                        if not _in_margin_csv:
+                                        # Step2: KABU+が空（週末・祝日）または銘柄なし → ratios.json から取得
+                                        if not _fetch_succeeded or not _in_margin_csv:
                                             _rdata = load_data()
                                             for _bucket in ("data", "all_data"):
                                                 _item = (_rdata.get(_bucket) or {}).get(_diag_ticker, {})
                                                 if _item:
-                                                    _mg_ratio = _item.get("margin_ratio")
-                                                    _mg_buy   = int(_item.get("margin_buy",  0) or 0)
-                                                    _mg_sell  = int(_item.get("margin_sell", 0) or 0)
+                                                    _r = _item.get("margin_ratio")
+                                                    _b = int(_item.get("margin_buy",  0) or 0)
+                                                    _s = int(_item.get("margin_sell", 0) or 0)
+                                                    if _r or _b or _s:  # ratios.jsonにデータがあれば上書き
+                                                        _mg_ratio, _mg_buy, _mg_sell = _r, _b, _s
                                                     break
 
                                         # 表示文字列の決定
@@ -1778,6 +1784,9 @@ def show_main_page():
                                             _margin_str = f"📊 買残{_mg_buy:,}（売残なし・倍率算出不可）"
                                         elif _mg_buy > 0 or _mg_sell > 0:
                                             _margin_str = f"📊 買残{_mg_buy:,} / 売残{_mg_sell:,}"
+                                        elif not _fetch_succeeded:
+                                            # KABU+取得自体が失敗（週末・祝日・ネットワーク等）
+                                            _margin_str = "📊 取得不可（週末・祝日はデータなし）"
                                         elif _in_margin_csv:
                                             # CSVには存在するが残高ゼロ
                                             _margin_str = "📊 残高なし（信用取引不活発）"
