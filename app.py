@@ -483,18 +483,37 @@ def _get_secret_value(section: str, key: str, env_name: str | None = None, defau
 
 def _get_gsheets_config() -> Dict:
     import os
+    import ast
+
     raw = os.getenv("GSHEETS_CREDENTIALS")
     if raw:
+        parsed = None
+
         try:
-            cfg = json.loads(raw)
-            if isinstance(cfg, dict):
-                cfg["spreadsheet"] = os.getenv("SPREADSHEET_URL", cfg.get("spreadsheet", ""))
-                cfg.setdefault("worksheet", "settings")
-                return cfg
+            parsed = json.loads(raw)
         except Exception:
-            pass
+            parsed = None
+
+        if not isinstance(parsed, dict):
+            try:
+                maybe = ast.literal_eval(raw)
+                if isinstance(maybe, dict):
+                    parsed = maybe
+            except Exception:
+                parsed = None
+
+        if isinstance(parsed, dict):
+            pk = parsed.get("private_key")
+            if isinstance(pk, str):
+                parsed["private_key"] = pk.replace("\r\n", "\n").replace("\r", "\n")
+            parsed["spreadsheet"] = os.getenv("SPREADSHEET_URL", parsed.get("spreadsheet", ""))
+            parsed.setdefault("worksheet", os.getenv("GSHEETS_WORKSHEET", "settings"))
+            return parsed
+
     try:
-        return dict(st.secrets["connections"]["gsheets"])
+        cfg = dict(st.secrets["connections"]["gsheets"])
+        cfg.setdefault("worksheet", cfg.get("worksheet") or "settings")
+        return cfg
     except Exception:
         return {}
 
