@@ -26,6 +26,7 @@ import re
 import ast
 import smtplib
 import io
+import os
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -469,70 +470,171 @@ def load_data() -> Dict:
 
     return data
 
-def get_fernet() -> Fernet: return Fernet(st.secrets["encryption"]["key"].encode())
-def encrypt_password(pw: str) -> str: return get_fernet().encrypt(pw.encode()).decode() if pw else ""
-def decrypt_password(pw: str) -> str: 
-    try: return get_fernet().decrypt(pw.encode()).decode() if pw else ""
-    except: return ""
+def _get_env_or_secret(env_name: str, secret_path: tuple[str, ...] | None = None, default=None):
+    value = os.getenv(env_name)
+    if value not in (None, ""):
+        return value
+    if secret_path:
+        try:
+            cur = st.secrets
+            for key in secret_path:
+                cur = cur[key]
+            return cur
+        except Exception:
+            pass
+    return default
 
-def get_gsheets_connection(): return st.connection("gsheets", type=GSheetsConnection)
+
+def _get_encryption_key() -> str:
+    key = _get_env_or_secret("ENCRYPTION_KEY", ("encryption", "key"), "")
+    if isinstance(key, str) and key.startswith("key ="):
+        key = key.split("=", 1)[1].strip().strip('"').strip("'")
+    return (key or "").strip()
+
+
+def _get_gsheets_config() -> dict:
+    raw = os.getenv("GSHEETS_CREDENTIALS")
+    spreadsheet_url = os.getenv("SPREADSHEET_URL", "").strip()
+    cfg = {}
+
+    if raw:
+        try:
+            cfg = json.loads(raw)
+        except Exception:
+            cfg = {}
+    else:
+        try:
+            cfg = dict(st.secrets["connections"]["gsheets"])
+        except Exception:
+            cfg = {}
+
+    if spreadsheet_url:
+        cfg["spreadsheet"] = spreadsheet_url
+    elif "spreadsheet" not in cfg:
+        try:
+            cfg["spreadsheet"] = st.secrets["connections"]["gsheets"].get("spreadsheet", "")
+        except Exception:
+            cfg["spreadsheet"] = ""
+
+    cfg["worksheet"] = cfg.get("worksheet") or "settings"
+    return cfg
+
+
+def _get_settings_worksheet():
+    client = get_gspread_client()
+    if not client:
+        return None
+    cfg = _get_gsheets_config()
+    url = (cfg.get("spreadsheet") or "").strip()
+    sheet_name = (cfg.get("worksheet") or "settings").strip() or "settings"
+    if not url:
+        return None
+    return client.open_by_url(url).worksheet(sheet_name)
+
+
+def get_fernet() -> Fernet:
+    key = _get_encryption_key()
+    if not key:
+        raise ValueError("Encryption key is not configured.")
+    return Fernet(key.encode())
+
+
+def encrypt_password(pw: str) -> str:
+    return get_fernet().encrypt(pw.encode()).decode() if pw else ""
+
+
+def decrypt_password(pw: str) -> str:
+    try:
+        return get_fernet().decrypt(pw.encode()).decode() if pw else ""
+    except Exception:
+        return ""
+
+
+def get_gsheets_connection():
+    return st.connection("gsheets", type=GSheetsConnection)
+
 
 def load_settings_by_email(email: str) -> Optional[Dict]:
-    if not email: return None
+    if not email:
+        return None
+    email = email.lower().strip()
     try:
-        df = get_gsheets_connection().read(worksheet="settings", usecols=[0, 1], ttl=0)
-        if df is None or df.empty: return None
-        df.columns = ["email", "encrypted_password"]
-        row = df[df["email"].str.lower().str.strip() == email.lower().strip()]
-        if row.empty: return None
-        return {"email": row.iloc[0]["email"], "encrypted_password": row.iloc[0]["encrypted_password"]}
-    except:
+        ws = _get_settings_worksheet()
+        if ws is None:
+            return None
+        records = ws.get_all_values()
+        if not records:
+            return None
+        for row in records:
+            if len(row) >= 2 and str(row[0]).lower().strip() == email:
+                return {"email": row[0], "encrypted_password": row[1]}
+        return None
+    except Exception:
         st.cache_data.clear()
         return None
 
+
 def get_gspread_client():
     try:
-        cd = dict(st.secrets["connections"]["gsheets"])
-        cd.pop("spreadsheet", None); cd.pop("worksheet", None)
-        creds = Credentials.from_service_account_info(cd, scopes=["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"])
+        cd = dict(_get_gsheets_config())
+        cd.pop("spreadsheet", None)
+        cd.pop("worksheet", None)
+        creds = Credentials.from_service_account_info(
+            cd,
+            scopes=[
+                "https://www.googleapis.com/auth/spreadsheets",
+                "https://www.googleapis.com/auth/drive",
+            ],
+        )
         return gspread.authorize(creds)
-    except: return None
+    except Exception:
+        return None
+
 
 def save_settings_to_sheet(email: str, app_password: str) -> bool:
-    if not email: return False
+    if not email:
+        return False
     email = email.lower().strip()
     try:
-        client = get_gspread_client()
-        if not client: return False
-        url = st.secrets["connections"]["gsheets"].get("spreadsheet")
-        ws = client.open_by_url(url).worksheet("settings")
+        ws = _get_settings_worksheet()
+        if ws is None:
+            return False
         enc_pw = encrypt_password(app_password)
-        try: all_emails = ws.col_values(1)
-        except: all_emails = []
+        try:
+            all_emails = ws.col_values(1)
+        except Exception:
+            all_emails = []
         row_index = next((i + 1 for i, ce in enumerate(all_emails) if ce and ce.lower().strip() == email), -1)
-        if row_index > 1: ws.update_cell(row_index, 2, enc_pw)
-        else: ws.append_row([email, enc_pw])
+        if row_index > 1:
+            ws.update_cell(row_index, 2, enc_pw)
+        else:
+            ws.append_row([email, enc_pw])
         st.cache_data.clear()
         return True
-    except: return False
+    except Exception:
+        return False
+
 
 def delete_settings_from_sheet(email: str) -> bool:
-    if not email: return False
+    if not email:
+        return False
     email = email.lower().strip()
     try:
-        client = get_gspread_client()
-        if not client: return False
-        url = st.secrets["connections"]["gsheets"].get("spreadsheet")
-        ws = client.open_by_url(url).worksheet("settings")
-        try: all_emails = ws.col_values(1)
-        except: all_emails = []
+        ws = _get_settings_worksheet()
+        if ws is None:
+            return False
+        try:
+            all_emails = ws.col_values(1)
+        except Exception:
+            all_emails = []
         row_index = next((i + 1 for i, ce in enumerate(all_emails) if ce and ce.lower().strip() == email), -1)
         if row_index > 1:
             ws.delete_rows(row_index)
             st.cache_data.clear()
             return True
         return False
-    except: return False
+    except Exception:
+        return False
 
 def send_test_email(email: str, app_password: str) -> tuple[bool, str]:
     try:
