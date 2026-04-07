@@ -1406,47 +1406,163 @@ def evaluate_stock(ticker):
         print(f"⚠️ [evaluate_stock] {ticker} 取得失敗: {type(e).__name__}: {e}")
         return None
 
+def _is_mobile_client() -> bool:
+    """ブラウザのUser-Agentからスマホ/タブレット系アクセスをざっくり判定。"""
+    try:
+        headers = getattr(st.context, "headers", {}) or {}
+        user_agent = ""
+        for key in ("user-agent", "User-Agent"):
+            if key in headers:
+                user_agent = str(headers.get(key, ""))
+                break
+
+        ua = user_agent.lower()
+        mobile_keywords = [
+            "iphone", "ipod", "ipad", "android", "mobile",
+            "windows phone", "webos", "blackberry"
+        ]
+        return any(keyword in ua for keyword in mobile_keywords)
+    except Exception:
+        return False
+
 def draw_chart(row, chart_key: str | None = None):
-    hist_data = row['hist'].tail(150)
+    is_mobile = _is_mobile_client()
+    hist_data = row['hist'].tail(90 if is_mobile else 150).copy()
     max_vol_price = row['max_vol_price']
     recent_20_low = row['recent_20_low']
-    
-    bins = 15
-    hist_data_copy = hist_data.copy()
-    hist_data_copy['price_bins'] = pd.cut(hist_data_copy['Close'], bins=bins)
-    vol_profile = hist_data_copy.groupby('price_bins', observed=False)['Volume'].sum()
-    bin_centers = [b.mid for b in vol_profile.index]
-    bin_volumes = vol_profile.values
-    
-    fig = make_subplots(rows=1, cols=2, shared_yaxes=True, column_widths=[0.85, 0.15], horizontal_spacing=0)
-    fig.add_trace(go.Candlestick(x=hist_data.index, open=hist_data['Open'], high=hist_data['High'], low=hist_data['Low'], close=hist_data['Close'], name="株価", showlegend=False), row=1, col=1)
-    fig.add_trace(go.Bar(x=bin_volumes, y=bin_centers, orientation='h', marker_color='rgba(255, 165, 0, 0.6)', name="出来高ボリューム", showlegend=False, hoverinfo='y'), row=1, col=2)
-    
-    fig.add_hline(y=max_vol_price, line_width=2, line_dash="dash", line_color="orange", 
-                  annotation_text=f" {int(max_vol_price)}円 🚧 需給の壁 ", 
-                  annotation_position="top left", annotation_font_color="orange", row=1, col=1)
-    fig.add_hline(y=max_vol_price, line_width=2, line_dash="dash", line_color="orange", row=1, col=2)
-    
-    fig.add_hline(y=recent_20_low, line_width=1.5, line_dash="dot", line_color="cyan", 
-                  annotation_text=f" 直近底値(1ヶ月) 🔵 {int(recent_20_low)}円 ", 
-                  annotation_position="bottom right", annotation_font_color="cyan", row=1, col=1)
-    fig.add_hline(y=recent_20_low, line_width=1.5, line_dash="dot", line_color="cyan", row=1, col=2)
 
-    fig.update_layout(
-        title=f"{row['銘柄名']} 日足 ＆ 価格帯別出来高", 
-        xaxis_rangeslider_visible=False, height=350, margin=dict(l=0, r=0, t=30, b=0), dragmode=False,
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)'
-    )
-    fig.update_xaxes(fixedrange=True); fig.update_yaxes(fixedrange=True)
-    fig.update_xaxes(showticklabels=False, row=1, col=2)
-    
+    bins = 12 if is_mobile else 15
+    hist_data['price_bins'] = pd.cut(hist_data['Close'], bins=bins)
+    vol_profile = hist_data.groupby('price_bins', observed=False)['Volume'].sum()
+    bin_centers = [float(b.mid) for b in vol_profile.index]
+    bin_labels = [f"{int(round(center))}円" for center in bin_centers]
+    bin_volumes = vol_profile.fillna(0).values
+
+    if is_mobile:
+        fig = make_subplots(
+            rows=2, cols=1,
+            shared_xaxes=False,
+            vertical_spacing=0.08,
+            row_heights=[0.68, 0.32]
+        )
+        fig.add_trace(
+            go.Candlestick(
+                x=hist_data.index,
+                open=hist_data['Open'], high=hist_data['High'],
+                low=hist_data['Low'], close=hist_data['Close'],
+                name="株価", showlegend=False
+            ),
+            row=1, col=1
+        )
+        fig.add_trace(
+            go.Bar(
+                x=bin_labels, y=bin_volumes,
+                marker_color='rgba(255, 165, 0, 0.65)',
+                name="価格帯別売買高",
+                showlegend=False,
+                hovertemplate="価格帯: %{x}<br>出来高: %{y:,}<extra></extra>"
+            ),
+            row=2, col=1
+        )
+
+        fig.add_hline(
+            y=max_vol_price, line_width=2, line_dash="dash", line_color="orange",
+            annotation_text=f"需給の壁 {int(max_vol_price)}円",
+            annotation_position="top left", annotation_font_color="orange",
+            row=1, col=1
+        )
+        fig.add_hline(
+            y=recent_20_low, line_width=1.5, line_dash="dot", line_color="cyan",
+            annotation_text=f"直近底値 {int(recent_20_low)}円",
+            annotation_position="bottom right", annotation_font_color="cyan",
+            row=1, col=1
+        )
+
+        fig.update_layout(
+            title=f"{row['銘柄名']} 日足（3か月）＆ 価格帯別売買高",
+            xaxis_rangeslider_visible=False,
+            height=560,
+            margin=dict(l=6, r=6, t=42, b=6),
+            dragmode=False,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        fig.update_xaxes(
+            fixedrange=True,
+            tickformat="%m/%d",
+            nticks=6,
+            row=1, col=1
+        )
+        fig.update_xaxes(
+            fixedrange=True,
+            tickangle=-35,
+            type='category',
+            row=2, col=1
+        )
+        fig.update_yaxes(fixedrange=True, row=1, col=1)
+        fig.update_yaxes(fixedrange=True, title_text="出来高", row=2, col=1)
+
+    else:
+        fig = make_subplots(
+            rows=1, cols=2, shared_yaxes=True,
+            column_widths=[0.85, 0.15], horizontal_spacing=0
+        )
+        fig.add_trace(
+            go.Candlestick(
+                x=hist_data.index,
+                open=hist_data['Open'], high=hist_data['High'],
+                low=hist_data['Low'], close=hist_data['Close'],
+                name="株価", showlegend=False
+            ),
+            row=1, col=1
+        )
+        fig.add_trace(
+            go.Bar(
+                x=bin_volumes, y=bin_centers, orientation='h',
+                marker_color='rgba(255, 165, 0, 0.6)',
+                name="出来高ボリューム", showlegend=False, hoverinfo='y'
+            ),
+            row=1, col=2
+        )
+
+        fig.add_hline(
+            y=max_vol_price, line_width=2, line_dash="dash", line_color="orange",
+            annotation_text=f" {int(max_vol_price)}円 🚧 需給の壁 ",
+            annotation_position="top left", annotation_font_color="orange",
+            row=1, col=1
+        )
+        fig.add_hline(y=max_vol_price, line_width=2, line_dash="dash", line_color="orange", row=1, col=2)
+
+        fig.add_hline(
+            y=recent_20_low, line_width=1.5, line_dash="dot", line_color="cyan",
+            annotation_text=f" 直近底値(1ヶ月) 🔵 {int(recent_20_low)}円 ",
+            annotation_position="bottom right", annotation_font_color="cyan",
+            row=1, col=1
+        )
+        fig.add_hline(y=recent_20_low, line_width=1.5, line_dash="dot", line_color="cyan", row=1, col=2)
+
+        fig.update_layout(
+            title=f"{row['銘柄名']} 日足 ＆ 価格帯別出来高",
+            xaxis_rangeslider_visible=False, height=350,
+            margin=dict(l=0, r=0, t=30, b=0), dragmode=False,
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)'
+        )
+        fig.update_xaxes(fixedrange=True)
+        fig.update_yaxes(fixedrange=True)
+        fig.update_xaxes(showticklabels=False, row=1, col=2)
+
     if chart_key:
         try:
-            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False}, key=chart_key)
+            st.plotly_chart(
+                fig,
+                use_container_width=True,
+                config={'displayModeBar': False, 'responsive': True},
+                key=chart_key
+            )
         except TypeError:
-            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
     else:
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
 
 def render_card(ticker: str, d: Dict):
     flow_score = d.get("flow_score", 0)
