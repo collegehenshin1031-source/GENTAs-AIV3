@@ -1425,18 +1425,111 @@ def _is_mobile_client() -> bool:
     except Exception:
         return False
 
+
+def _normalize_chart_hist_for_split(hist: pd.DataFrame) -> tuple[pd.DataFrame, dict | None]:
+    """
+    株式分割・併合のような急激な価格スケール変化が描画期間内に混ざると、
+    ライン注釈やY軸が極端に圧縮されてスマホ表示が崩れる。
+    そのため、表示用チャートだけは不連続点を検知して過去データを現在スケールへ補正する。
+    """
+    if hist is None or hist.empty or len(hist) < 10:
+        return hist, None
+
+    out = hist.copy()
+    closes = pd.to_numeric(out["Close"], errors="coerce")
+    ratios = closes / closes.shift(1)
+    ratios = ratios.replace([np.inf, -np.inf], np.nan).dropna()
+    if ratios.empty:
+        return out, None
+
+    # 一般的な分割・併合比率に寄せて判定
+    candidate_factors = np.array([0.1, 0.2, 0.25, 1/3, 0.5, 2.0, 3.0, 4.0, 5.0, 10.0], dtype=float)
+    log_candidates = np.log(candidate_factors)
+
+    best_idx = None
+    best_factor = None
+    best_score = None
+
+    for idx, ratio in ratios.items():
+        if ratio <= 0:
+            continue
+        log_ratio = np.log(float(ratio))
+        nearest_pos = int(np.argmin(np.abs(log_candidates - log_ratio)))
+        nearest_factor = float(candidate_factors[nearest_pos])
+        distance = float(abs(log_candidates[nearest_pos] - log_ratio))
+        # 通常の値動きでは起きにくい大きな不連続だけ拾う
+        if distance <= 0.18 and (nearest_factor <= 0.55 or nearest_factor >= 1.8):
+            score = abs(log_ratio)
+            if best_score is None or score > best_score:
+                best_idx = idx
+                best_factor = nearest_factor
+                best_score = score
+
+    if best_idx is None or best_factor is None:
+        return out, None
+
+    prev_mask = out.index < best_idx
+    if not prev_mask.any():
+        return out, None
+
+    for col in ["Open", "High", "Low", "Close"]:
+        out.loc[prev_mask, col] = pd.to_numeric(out.loc[prev_mask, col], errors="coerce") * best_factor
+
+    # 分割前の出来高は現在株数ベースへ寄せる
+    vol_factor = 1.0 / best_factor if best_factor != 0 else 1.0
+    out.loc[prev_mask, "Volume"] = pd.to_numeric(out.loc[prev_mask, "Volume"], errors="coerce").fillna(0) * vol_factor
+
+    info = {
+        "split_date": pd.Timestamp(best_idx),
+        "factor": float(best_factor),
+    }
+    return out, info
+
+
+def _calc_local_profile_levels(hist_data: pd.DataFrame, bins: int = 15) -> tuple[float, float]:
+    local_recent_low = float(pd.to_numeric(hist_data["Low"], errors="coerce").tail(20).min())
+
+    closes = pd.to_numeric(hist_data["Close"], errors="coerce")
+    if closes.nunique(dropna=True) > 1:
+        price_bins = pd.cut(closes, bins=bins)
+        vol_profile = hist_data.assign(price_bins=price_bins).groupby("price_bins", observed=False)["Volume"].sum()
+        try:
+            local_max_vol_price = float(vol_profile.idxmax().mid)
+        except Exception:
+            local_max_vol_price = float(closes.iloc[-1])
+    else:
+        local_max_vol_price = float(closes.iloc[-1])
+
+    return local_max_vol_price, local_recent_low
+
+
 def draw_chart(row, chart_key: str | None = None):
     is_mobile = _is_mobile_client()
-    hist_data = row['hist'].tail(90 if is_mobile else 150).copy()
-    max_vol_price = row['max_vol_price']
-    recent_20_low = row['recent_20_low']
+    raw_hist = row['hist'].tail(90 if is_mobile else 150).copy()
+    hist_data, split_info = _normalize_chart_hist_for_split(raw_hist)
 
     bins = 12 if is_mobile else 15
-    hist_data['price_bins'] = pd.cut(hist_data['Close'], bins=bins)
+    max_vol_price, recent_20_low = _calc_local_profile_levels(hist_data, bins=bins)
+
+    hist_data['price_bins'] = pd.cut(pd.to_numeric(hist_data['Close'], errors='coerce'), bins=bins)
     vol_profile = hist_data.groupby('price_bins', observed=False)['Volume'].sum()
     bin_centers = [float(b.mid) for b in vol_profile.index]
     bin_labels = [f"{int(round(center))}円" for center in bin_centers]
     bin_volumes = vol_profile.fillna(0).values
+
+    visible_min = float(np.nanmin([hist_data['Low'].min(), max_vol_price, recent_20_low]))
+    visible_max = float(np.nanmax([hist_data['High'].max(), max_vol_price, recent_20_low]))
+    pad = max((visible_max - visible_min) * 0.08, max(visible_max, 1) * 0.02)
+    y_range = [visible_min - pad, visible_max + pad]
+
+    split_note = None
+    if split_info:
+        factor = split_info['factor']
+        split_date = split_info['split_date']
+        if factor < 1:
+            split_note = f"表示期間内に株式分割相当の価格段差を検知したため、{split_date:%Y-%m-%d}以前を現在株価ベースへ補正して表示しています。"
+        else:
+            split_note = f"表示期間内に株式併合相当の価格段差を検知したため、{split_date:%Y-%m-%d}以前を現在株価ベースへ補正して表示しています。"
 
     if is_mobile:
         fig = make_subplots(
@@ -1499,7 +1592,7 @@ def draw_chart(row, chart_key: str | None = None):
             type='category',
             row=2, col=1
         )
-        fig.update_yaxes(fixedrange=True, row=1, col=1)
+        fig.update_yaxes(fixedrange=True, range=y_range, row=1, col=1)
         fig.update_yaxes(fixedrange=True, title_text="出来高", row=2, col=1)
 
     else:
@@ -1548,7 +1641,7 @@ def draw_chart(row, chart_key: str | None = None):
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)'
         )
         fig.update_xaxes(fixedrange=True)
-        fig.update_yaxes(fixedrange=True)
+        fig.update_yaxes(fixedrange=True, range=y_range)
         fig.update_xaxes(showticklabels=False, row=1, col=2)
 
     if chart_key:
@@ -1563,6 +1656,9 @@ def draw_chart(row, chart_key: str | None = None):
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
     else:
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False, 'responsive': True})
+
+    if split_note:
+        st.caption(f"※ {split_note}")
 
 def render_card(ticker: str, d: Dict):
     flow_score = d.get("flow_score", 0)
