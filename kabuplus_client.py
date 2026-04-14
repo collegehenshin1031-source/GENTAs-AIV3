@@ -262,11 +262,11 @@ def fetch_ohlc_history(
 
     print(f"  📡 OHLC逐次取得開始（目標{lookback_days}営業日 / 間隔{request_interval}s）")
 
- for i in range(calendar_window):
-    target = today - timedelta(days=i)
-    if target.weekday() >= 5:   # ★土曜=5, 日曜=6をスキップ
-        continue
-    verbose = (i < 10)  # 最初の10件だけ詳細ログ
+for i in range(calendar_window):
+        target = today - timedelta(days=i)
+        if target.weekday() >= 5:   # ★土曜=5, 日曜=6をスキップ
+            continue
+        verbose = (i < 10)  # 最初の10件だけ詳細ログ
 
         result = _fetch_ohlc_one_day(target, auth, verbose=verbose)
         if result is not None:
