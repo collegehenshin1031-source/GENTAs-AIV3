@@ -133,41 +133,47 @@ def _get_kabuplus_info(ticker: str) -> dict:
 
 
 def _load_kabuplus_margin() -> dict:
-    """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築。
-    信用残高は週次（金曜日更新）のため、直近金曜のCSVを優先取得する。
-    取得成功時のみ session_state にキャッシュ（6時間）。
-    空データはキャッシュしないことで、再起動なしに次回取得を試みる。
-    """
     import time
-    CACHE_KEY = "_margin_cache"
+    CACHE_KEY  = "_margin_cache"
     CACHE_TS   = "_margin_cache_ts"
-    TTL = 21600  # 6時間（週次データ）
+    FAIL_TS    = "_margin_fail_ts"   # ★追加：失敗時刻
+    TTL        = 21600   # 成功キャッシュ: 6時間
+    FAIL_TTL   = 1800    # ★失敗キャッシュ: 30分（この間はリトライしない）
 
-    # session_state キャッシュヒット確認
     now = time.time()
-    cached = st.session_state.get(CACHE_KEY)
+
+    # 成功キャッシュヒット
+    cached    = st.session_state.get(CACHE_KEY)
     cached_ts = st.session_state.get(CACHE_TS, 0)
     if cached is not None and (now - cached_ts) < TTL:
         return cached
 
-    # KABU+ から取得
+    # ★失敗キャッシュヒット（30分以内の失敗はスキップ）
+    fail_ts = st.session_state.get(FAIL_TS, 0)
+    if (now - fail_ts) < FAIL_TTL:
+        return {}
+
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
+            st.session_state[FAIL_TS] = now  # ★失敗記録
             return {}
         margin_df = kp.fetch_margin_data(uid, pwd)
         if margin_df.empty:
-            print("⚠️ [_load_kabuplus_margin] KABU+信用残高CSV空（金曜CSVが未公開の可能性）")
-            return {}  # 空はキャッシュしない
+            print("⚠️ [_load_kabuplus_margin] KABU+信用残高CSV空")
+            st.session_state[FAIL_TS] = now  # ★失敗記録
+            return {}
         result = kp.build_margin_lookup(margin_df)
         if result:
             st.session_state[CACHE_KEY] = result
             st.session_state[CACHE_TS]  = now
-            print(f"✅ [_load_kabuplus_margin] {len(result)}銘柄 取得・キャッシュ完了")
+            st.session_state.pop(FAIL_TS, None)  # 成功したら失敗記録を消す
+            print(f"✅ [_load_kabuplus_margin] {len(result)}銘柄 取得完了")
         return result
     except Exception as e:
         print(f"⚠️ [_load_kabuplus_margin] 取得失敗: {e}")
-        return {}  # 空はキャッシュしない
+        st.session_state[FAIL_TS] = now  # ★失敗記録
+        return {}
 
 # ==========================================
 # カート操作のコールバック関数（即時反映用）
