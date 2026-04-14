@@ -262,7 +262,7 @@ def fetch_ohlc_history(
 
     print(f"  📡 OHLC逐次取得開始（目標{lookback_days}営業日 / 間隔{request_interval}s）")
 
-for i in range(calendar_window):
+    for i in range(calendar_window):
         target = today - timedelta(days=i)
         if target.weekday() >= 5:   # ★土曜=5, 日曜=6をスキップ
             continue
