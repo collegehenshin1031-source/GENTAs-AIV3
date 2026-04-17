@@ -149,12 +149,21 @@ def _get_kabuplus_info(ticker: str) -> dict:
 
 
 def _load_kabuplus_margin() -> dict:
+    """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築。
+    信用残高は週次（通常火曜17時、月曜祝日の場合は水曜）更新。
+    火曜・水曜のみ取得を試みる。それ以外の曜日はリクエストしない。
+    取得成功時のみ session_state にキャッシュ（7日間）。
+    失敗時は30分間リトライしない（404連発防止）。
+    """
     import time
-    CACHE_KEY  = "_margin_cache"
-    CACHE_TS   = "_margin_cache_ts"
-    FAIL_TS    = "_margin_fail_ts"   # ★追加：失敗時刻
-    TTL        = 21600   # 成功キャッシュ: 6時間
-    FAIL_TTL   = 1800    # ★失敗キャッシュ: 30分（この間はリトライしない）
+    import pytz
+    from datetime import datetime
+
+    CACHE_KEY = "_margin_cache"
+    CACHE_TS  = "_margin_cache_ts"
+    FAIL_TS   = "_margin_fail_ts"
+    TTL       = 604800  # 成功キャッシュ: 7日間（週次データのため）
+    FAIL_TTL  = 1800    # 失敗キャッシュ: 30分
 
     now = time.time()
 
@@ -164,32 +173,39 @@ def _load_kabuplus_margin() -> dict:
     if cached is not None and (now - cached_ts) < TTL:
         return cached
 
-    # ★失敗キャッシュヒット（30分以内の失敗はスキップ）
+    # ★曜日チェック：火曜(1)・水曜(2)以外はリクエストしない
+    JST = pytz.timezone("Asia/Tokyo")
+    weekday = datetime.now(JST).weekday()
+    if weekday not in (1, 2):  # 0=月, 1=火, 2=水, 3=木, 4=金, 5=土, 6=日
+        return cached if cached is not None else {}
+
+    # 失敗キャッシュヒット（30分以内の失敗はスキップ）
     fail_ts = st.session_state.get(FAIL_TS, 0)
     if (now - fail_ts) < FAIL_TTL:
-        return {}
+        return cached if cached is not None else {}
 
+    # KABU+ から取得
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
-            st.session_state[FAIL_TS] = now  # ★失敗記録
-            return {}
+            st.session_state[FAIL_TS] = now
+            return cached if cached is not None else {}
         margin_df = kp.fetch_margin_data(uid, pwd)
         if margin_df.empty:
-            print("⚠️ [_load_kabuplus_margin] KABU+信用残高CSV空")
-            st.session_state[FAIL_TS] = now  # ★失敗記録
-            return {}
+            print("⚠️ [_load_kabuplus_margin] KABU+信用残高CSV空（未公開の可能性）")
+            st.session_state[FAIL_TS] = now
+            return cached if cached is not None else {}
         result = kp.build_margin_lookup(margin_df)
         if result:
             st.session_state[CACHE_KEY] = result
             st.session_state[CACHE_TS]  = now
-            st.session_state.pop(FAIL_TS, None)  # 成功したら失敗記録を消す
+            st.session_state.pop(FAIL_TS, None)
             print(f"✅ [_load_kabuplus_margin] {len(result)}銘柄 取得完了")
         return result
     except Exception as e:
         print(f"⚠️ [_load_kabuplus_margin] 取得失敗: {e}")
-        st.session_state[FAIL_TS] = now  # ★失敗記録
-        return {}
+        st.session_state[FAIL_TS] = now
+        return cached if cached is not None else {}
 
 # ==========================================
 # カート操作のコールバック関数（即時反映用）
