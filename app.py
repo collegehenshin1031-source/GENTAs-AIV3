@@ -113,17 +113,33 @@ yf_session = get_yf_session()
 # ==========================================
 @st.cache_data(ttl=3600, show_spinner=False)
 def _load_kabuplus_info() -> dict:
-    """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築（1時間キャッシュ）"""
+    """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築（1時間キャッシュ）
+    失敗時は30分間リトライしない（404連発防止）。
+    """
+    import time
+    INFO_FAIL_KEY = "_info_fail_ts"
+    INFO_FAIL_TTL = 1800  # 失敗後30分はリトライしない
+
+    now = time.time()
+    fail_ts = st.session_state.get(INFO_FAIL_KEY, 0)
+    if (now - fail_ts) < INFO_FAIL_TTL:
+        return {}
+
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
+            st.session_state[INFO_FAIL_KEY] = now
             return {}
         merged = kp.fetch_merged_data(uid, pwd)
         if merged.empty:
+            print("⚠️ [_load_kabuplus_info] 取得失敗（空データ）")
+            st.session_state[INFO_FAIL_KEY] = now
             return {}
+        st.session_state.pop(INFO_FAIL_KEY, None)  # 成功したら失敗記録を消す
         return kp.build_info_lookup(merged)
     except Exception as e:
         print(f"⚠️ [_load_kabuplus_info] 取得失敗: {e}")
+        st.session_state[INFO_FAIL_KEY] = now
         return {}
 
 
