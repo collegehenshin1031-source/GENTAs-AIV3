@@ -111,36 +111,63 @@ yf_session = get_yf_session()
 # ==========================================
 # 【KABU+ 一括データ】診断用の銘柄情報キャッシュ
 # ==========================================
-@st.cache_data(ttl=3600, show_spinner=False)
 def _load_kabuplus_info() -> dict:
-    """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築（1時間キャッシュ）
-    失敗時は30分間リトライしない（404連発防止）。
+    """KABU+ から全銘柄の指標データを一括取得し info 辞書を構築。
+    平日17:00〜23:59のみ取得を試みる（KABU+更新が16:30のため）。
+    失敗時は30分間リトライしない。成功時は翌17:00まで12時間キャッシュ。
     """
     import time
-    INFO_FAIL_KEY = "_info_fail_ts"
-    INFO_FAIL_TTL = 1800  # 失敗後30分はリトライしない
+    import pytz
+    from datetime import datetime
+
+    CACHE_KEY = "_info_cache"
+    CACHE_TS  = "_info_cache_ts"
+    FAIL_KEY  = "_info_fail_ts"
+    TTL       = 43200  # 成功キャッシュ: 12時間
+    FAIL_TTL  = 1800   # 失敗キャッシュ: 30分
 
     now = time.time()
-    fail_ts = st.session_state.get(INFO_FAIL_KEY, 0)
-    if (now - fail_ts) < INFO_FAIL_TTL:
-        return {}
 
+    # 成功キャッシュヒット
+    cached    = st.session_state.get(CACHE_KEY)
+    cached_ts = st.session_state.get(CACHE_TS, 0)
+    if cached is not None and (now - cached_ts) < TTL:
+        return cached
+
+    # 平日17:00〜23:59のみ取得（KABU+は16:30頃更新）
+    JST = pytz.timezone("Asia/Tokyo")
+    now_jst = datetime.now(JST)
+    is_weekday = now_jst.weekday() < 5  # 月〜金
+    is_after_17 = now_jst.hour >= 17
+    if not (is_weekday and is_after_17):
+        return cached if cached is not None else {}
+
+    # 失敗キャッシュヒット（30分以内はリトライしない）
+    fail_ts = st.session_state.get(FAIL_KEY, 0)
+    if (now - fail_ts) < FAIL_TTL:
+        return cached if cached is not None else {}
+
+    # KABU+ から取得
     try:
         uid, pwd = kp.get_credentials()
         if not uid or not pwd:
-            st.session_state[INFO_FAIL_KEY] = now
-            return {}
+            st.session_state[FAIL_KEY] = now
+            return cached if cached is not None else {}
         merged = kp.fetch_merged_data(uid, pwd)
         if merged.empty:
             print("⚠️ [_load_kabuplus_info] 取得失敗（空データ）")
-            st.session_state[INFO_FAIL_KEY] = now
-            return {}
-        st.session_state.pop(INFO_FAIL_KEY, None)  # 成功したら失敗記録を消す
-        return kp.build_info_lookup(merged)
+            st.session_state[FAIL_KEY] = now
+            return cached if cached is not None else {}
+        result = kp.build_info_lookup(merged)
+        st.session_state[CACHE_KEY] = result
+        st.session_state[CACHE_TS]  = now
+        st.session_state.pop(FAIL_KEY, None)
+        print(f"✅ [_load_kabuplus_info] 取得完了")
+        return result
     except Exception as e:
         print(f"⚠️ [_load_kabuplus_info] 取得失敗: {e}")
-        st.session_state[INFO_FAIL_KEY] = now
-        return {}
+        st.session_state[FAIL_KEY] = now
+        return cached if cached is not None else {}
 
 
 def _get_kabuplus_info(ticker: str) -> dict:
@@ -151,9 +178,8 @@ def _get_kabuplus_info(ticker: str) -> dict:
 def _load_kabuplus_margin() -> dict:
     """KABU+ から全銘柄の信用残高データを一括取得し辞書を構築。
     信用残高は週次（通常火曜17時、月曜祝日の場合は水曜）更新。
-    火曜・水曜のみ取得を試みる。それ以外の曜日はリクエストしない。
-    取得成功時のみ session_state にキャッシュ（7日間）。
-    失敗時は30分間リトライしない（404連発防止）。
+    火曜・水曜の17:00以降のみ取得を試みる。それ以外はリクエストしない。
+    取得成功時は7日間キャッシュ。失敗時は30分間リトライしない。
     """
     import time
     import pytz
@@ -162,7 +188,7 @@ def _load_kabuplus_margin() -> dict:
     CACHE_KEY = "_margin_cache"
     CACHE_TS  = "_margin_cache_ts"
     FAIL_TS   = "_margin_fail_ts"
-    TTL       = 604800  # 成功キャッシュ: 7日間（週次データのため）
+    TTL       = 604800  # 成功キャッシュ: 7日間
     FAIL_TTL  = 1800    # 失敗キャッシュ: 30分
 
     now = time.time()
@@ -173,13 +199,15 @@ def _load_kabuplus_margin() -> dict:
     if cached is not None and (now - cached_ts) < TTL:
         return cached
 
-    # ★曜日チェック：火曜(1)・水曜(2)以外はリクエストしない
+    # 火曜(1)・水曜(2)の17:00以降のみ取得
     JST = pytz.timezone("Asia/Tokyo")
-    weekday = datetime.now(JST).weekday()
-    if weekday not in (1, 2):  # 0=月, 1=火, 2=水, 3=木, 4=金, 5=土, 6=日
+    now_jst     = datetime.now(JST)
+    weekday     = now_jst.weekday()
+    is_after_17 = now_jst.hour >= 17
+    if weekday not in (1, 2) or not is_after_17:
         return cached if cached is not None else {}
 
-    # 失敗キャッシュヒット（30分以内の失敗はスキップ）
+    # 失敗キャッシュヒット（30分以内はリトライしない）
     fail_ts = st.session_state.get(FAIL_TS, 0)
     if (now - fail_ts) < FAIL_TTL:
         return cached if cached is not None else {}
@@ -206,7 +234,6 @@ def _load_kabuplus_margin() -> dict:
         print(f"⚠️ [_load_kabuplus_margin] 取得失敗: {e}")
         st.session_state[FAIL_TS] = now
         return cached if cached is not None else {}
-
 # ==========================================
 # カート操作のコールバック関数（即時反映用）
 # ==========================================
