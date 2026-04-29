@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-04-28 18:42:55",
-  "date": "2026-04-28",
+  "updated_at": "2026-04-29 18:35:25",
+  "date": "2026-04-29",
   "market_cap_range": "300億〜2000億円",
   "total_count": 181,
   "all_count": 3756,
@@ -1179,7 +1179,7 @@
         "range_compression": 0.0,
         "lower_shadow": 50.6
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 49.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -1188,7 +1188,8 @@
       "support_gap_pct": 7.7,
       "tags": [
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 86200,
       "margin_sell": 90900,
@@ -3637,7 +3638,7 @@
         "range_compression": 7.9,
         "lower_shadow": 58.5
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 28.6,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3647,7 +3648,8 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 500800,
       "margin_sell": 1987700,
@@ -3680,7 +3682,7 @@
         "range_compression": 96.0,
         "lower_shadow": 50.0
       },
-      "flow_streak_high": 3,
+      "flow_streak_high": 4,
       "reorg_score": 20.6,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3691,7 +3693,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続3日"
+        "継続4日"
       ],
       "margin_buy": 7700,
       "margin_sell": 1700,
@@ -4296,7 +4298,7 @@
         "range_compression": 0.0,
         "lower_shadow": 86.0
       },
-      "flow_streak_high": 2,
+      "flow_streak_high": 3,
       "reorg_score": 26.6,
       "event_score": 0.0,
       "display_state": "観測中",
@@ -4305,7 +4307,7 @@
       "support_gap_pct": 1.0,
       "tags": [
         "下側ゾーン",
-        "継続2日"
+        "継続3日"
       ],
       "margin_buy": 25800,
       "margin_sell": 0,
@@ -4377,7 +4379,7 @@
         "range_compression": 94.7,
         "lower_shadow": 50.0
       },
-      "flow_streak_high": 2,
+      "flow_streak_high": 3,
       "reorg_score": 24.3,
       "event_score": 0.0,
       "display_state": "観測中",
@@ -4386,7 +4388,7 @@
       "support_gap_pct": 1.4,
       "tags": [
         "下側ゾーン",
-        "継続2日"
+        "継続3日"
       ],
       "margin_buy": 500600,
       "margin_sell": 54700,
@@ -8661,7 +8663,7 @@
         "range_compression": 0.0,
         "lower_shadow": 50.6
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 49.2,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -8670,7 +8672,8 @@
       "support_gap_pct": 7.7,
       "tags": [
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 86200,
       "margin_sell": 90900,
@@ -13838,7 +13841,7 @@
         "range_compression": 7.9,
         "lower_shadow": 58.5
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 28.6,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -13848,7 +13851,8 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 500800,
       "margin_sell": 1987700,
@@ -14002,7 +14006,7 @@
         "range_compression": 96.0,
         "lower_shadow": 50.0
       },
-      "flow_streak_high": 3,
+      "flow_streak_high": 4,
       "reorg_score": 20.6,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -14013,7 +14017,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続3日"
+        "継続4日"
       ],
       "margin_buy": 7700,
       "margin_sell": 1700,
@@ -16001,7 +16005,7 @@
         "range_compression": 0.0,
         "lower_shadow": 86.0
       },
-      "flow_streak_high": 2,
+      "flow_streak_high": 3,
       "reorg_score": 26.6,
       "event_score": 0.0,
       "display_state": "観測中",
@@ -16010,7 +16014,7 @@
       "support_gap_pct": 1.0,
       "tags": [
         "下側ゾーン",
-        "継続2日"
+        "継続3日"
       ],
       "margin_buy": 25800,
       "margin_sell": 0,
@@ -16404,7 +16408,7 @@
         "range_compression": 94.7,
         "lower_shadow": 50.0
       },
-      "flow_streak_high": 2,
+      "flow_streak_high": 3,
       "reorg_score": 24.3,
       "event_score": 0.0,
       "display_state": "観測中",
@@ -16413,7 +16417,7 @@
       "support_gap_pct": 1.4,
       "tags": [
         "下側ゾーン",
-        "継続2日"
+        "継続3日"
       ],
       "margin_buy": 500600,
       "margin_sell": 54700,
@@ -49011,7 +49015,7 @@
       "margin_ratio": 112.29
     },
     "135A.T": {
-      "name": "ＶＲＡＩＮ　Ｓｏｌｕｔｉｏｎ",
+      "name": "(株)ＶＲＡＩＮ　Ｓｏｌｕｔｉｏｎ",
       "price": 3270.0,
       "volume": 71500,
       "avg_volume": 120020,
