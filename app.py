@@ -1274,19 +1274,11 @@ def _evaluate_stock_cached(ticker):
         cap_category = "small"
         intervention_name = "⚠️ 短期資金・過熱度 (超小型)"
 
-    hist_6mo = hist.tail(125)
-    
-    # 価格が全く動いていない銘柄で pd.cut がエラーを起こすのを防ぐ
-    if hist_6mo['Close'].nunique() > 1:
-        price_bins = pd.cut(hist_6mo['Close'], bins=15)
-        vol_profile = hist_6mo.groupby(price_bins, observed=False)['Volume'].sum()
-        try:
-            max_vol_price = vol_profile.idxmax().mid
-        except Exception:
-            max_vol_price = current_price
-    else:
-        max_vol_price = current_price
-        
+    # 需給の壁は draw_chart と完全に同一のロジック（_calc_supply_wall）で算出する。
+    # これにより「チャートのオレンジ点線」と「安全性（乖離率）の数値」が必ず一致し、
+    # かつ直近の出来高急増（吹き値）に壁が引きずられて割安と誤判定される問題を防ぐ。
+    max_vol_price = _calc_supply_wall(hist, lookback=125)
+
     recent_20_low = hist['Low'][-20:].min() if len(hist) >= 20 else hist['Low'].min()
 
     upside_potential = 0
@@ -1568,13 +1560,59 @@ def _calc_local_profile_levels(hist_data: pd.DataFrame, bins: int = 15) -> tuple
     return local_max_vol_price, local_recent_low
 
 
+def _calc_supply_wall(hist_data: pd.DataFrame, lookback: int = 125,
+                      n_bins: int = 48, smooth_frac: float = 0.12) -> float:
+    """需給の壁（最も売買代金が累積した価格ゾーン）を堅牢に算出する。
+
+    従来の pd.cut(bins=15) + idxmax() には次の弱点があり、
+    対象期間（日数）がわずかに変わるだけで壁が乱高下していた。
+      ・幅の広い累積ゾーンが複数の等幅ビンに分断され、各ビンの票が割れて過小評価される
+      ・直近の出来高急増（吹き値・ブローオフ）が単独ビンに集中して過大評価され、
+        本来は「現在値より下にあるべき壁」が現在値付近まで引き上げられてしまう
+
+    対策として、細かいビンで出来高プロファイルを作成し、隣接ビンの移動和で平滑化して
+    『点（スパイク）』ではなく『帯（ゾーン）』の最頻値を壁とする。これにより期間の
+    取り方に対して安定した値を返す。
+    """
+    h = hist_data.tail(lookback)
+    closes = pd.to_numeric(h["Close"], errors="coerce")
+    if closes.nunique(dropna=True) <= 1:
+        return float(closes.iloc[-1])
+    try:
+        price_bins = pd.cut(closes, bins=n_bins)
+        vol_profile = (
+            h.assign(_pb=price_bins)
+             .groupby("_pb", observed=False)["Volume"].sum()
+             .fillna(0)
+        )
+        centers = np.array([iv.mid for iv in vol_profile.index], dtype=float)
+        values = vol_profile.values.astype(float)
+        # 価格レンジの約 smooth_frac 分を窓幅（奇数本）とする移動和で平滑化
+        win = max(3, (int(round(n_bins * smooth_frac)) | 1))
+        smoothed = np.convolve(values, np.ones(win), mode="same")
+        return float(centers[int(np.argmax(smoothed))])
+    except Exception:
+        return float(closes.iloc[-1])
+
+
 def draw_chart(row, chart_key: str | None = None):
     is_mobile = _is_mobile_client()
     raw_hist = row['hist'].tail(90 if is_mobile else 150).copy()
     hist_data, split_info = _normalize_chart_hist_for_split(raw_hist)
 
     bins = 12 if is_mobile else 15
-    max_vol_price, recent_20_low = _calc_local_profile_levels(hist_data, bins=bins)
+
+    # 需給の壁・直近底値は診断時（_evaluate_stock_cached）に算出済みの値を最優先で使い、
+    # 「チャートのオレンジ点線」と「安全性（乖離率）の数値」を必ず一致させる。
+    # row に値が無い旧データ等のフォールバック時のみ、同一の堅牢ロジックで再計算する。
+    max_vol_price = row.get('max_vol_price')
+    recent_20_low = row.get('recent_20_low')
+    if max_vol_price is None:
+        max_vol_price = _calc_supply_wall(hist_data, lookback=len(hist_data))
+    if recent_20_low is None:
+        _, recent_20_low = _calc_local_profile_levels(hist_data, bins=bins)
+    max_vol_price = float(max_vol_price)
+    recent_20_low = float(recent_20_low)
 
     hist_data['price_bins'] = pd.cut(pd.to_numeric(hist_data['Close'], errors='coerce'), bins=bins)
     vol_profile = hist_data.groupby('price_bins', observed=False)['Volume'].sum()
