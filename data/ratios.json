@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-21 01:18:49",
-  "date": "2026-11-21",
+  "updated_at": "2026-11-24 04:26:14",
+  "date": "2026-11-24",
   "market_cap_range": "300億〜2000億円",
   "total_count": 65,
   "all_count": 3699,
@@ -357,7 +357,7 @@
         "range_compression": 7.1,
         "lower_shadow": 62.9
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 42.3,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -367,7 +367,8 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 212500,
       "margin_sell": 17000,
@@ -441,7 +442,7 @@
         "range_compression": 96.6,
         "lower_shadow": 20.0
       },
-      "flow_streak_high": 2,
+      "flow_streak_high": 3,
       "reorg_score": 33.7,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -452,7 +453,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続2日"
+        "継続3日"
       ],
       "margin_buy": 358600,
       "margin_sell": 19100,
@@ -688,7 +689,7 @@
         "range_compression": 97.0,
         "lower_shadow": 0.0
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 44.1,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -699,7 +700,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 180800,
       "margin_sell": 10300,
@@ -732,7 +733,7 @@
         "range_compression": 0.0,
         "lower_shadow": 16.0
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 37.4,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -742,7 +743,8 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 322900,
       "margin_sell": 15700,
@@ -3040,7 +3042,7 @@
         "range_compression": 7.1,
         "lower_shadow": 62.9
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 42.3,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3050,7 +3052,8 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 212500,
       "margin_sell": 17000,
@@ -3163,7 +3166,7 @@
         "range_compression": 96.6,
         "lower_shadow": 20.0
       },
-      "flow_streak_high": 2,
+      "flow_streak_high": 3,
       "reorg_score": 33.7,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3174,7 +3177,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続2日"
+        "継続3日"
       ],
       "margin_buy": 358600,
       "margin_sell": 19100,
@@ -3410,7 +3413,7 @@
         "range_compression": 97.0,
         "lower_shadow": 0.0
       },
-      "flow_streak_high": 5,
+      "flow_streak_high": 6,
       "reorg_score": 44.1,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3421,7 +3424,7 @@
         "下側ゾーン",
         "要監視",
         "出来高変化",
-        "継続5日"
+        "継続6日"
       ],
       "margin_buy": 180800,
       "margin_sell": 10300,
@@ -3454,7 +3457,7 @@
         "range_compression": 0.0,
         "lower_shadow": 16.0
       },
-      "flow_streak_high": 1,
+      "flow_streak_high": 2,
       "reorg_score": 37.4,
       "event_score": 0.0,
       "display_state": "要監視",
@@ -3464,7 +3467,8 @@
       "tags": [
         "下側ゾーン",
         "要監視",
-        "出来高変化"
+        "出来高変化",
+        "継続2日"
       ],
       "margin_buy": 322900,
       "margin_sell": 15700,
